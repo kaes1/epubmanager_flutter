@@ -3,7 +3,9 @@ import 'dart:developer';
 
 import 'package:epubmanager_flutter/ApiEndpoints.dart' as ApiEndpoints;
 import 'package:epubmanager_flutter/ApiService.dart';
+import 'package:epubmanager_flutter/model/Book.dart';
 import 'package:epubmanager_flutter/model/BooksPage.dart';
+import 'package:epubmanager_flutter/screens/BookDetailsScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
@@ -62,9 +64,13 @@ class BookSearchScreenState extends State<BookSearchScreen> {
       ),
       body: ListView(
         children: (_booksPage != null) ? _booksPage.content.map((book) {
-          return ListTile(title: Text(book.title), subtitle: Text(book.author.name),);
+          return ListTile(title: Text(book.title), subtitle: Text(book.author.name), onTap: _displayBookDetails(book));
         }).toList() : [],
       ),
     );
+  }
+
+  _displayBookDetails(Book book) {
+    Navigator.push(context, MaterialPageRoute(builder: (context) => BookDetailsScreen(book: book)));
   }
 }

@@ -15,6 +15,9 @@ class BookUploadScreenState extends State<BookUploadScreen> {
     return Scaffold(
       drawer: MenuDrawer(),
       appBar: AppBar(title: Text('Upload .epub'),),
+      body: Card(
+        child: Text('Choose .epub file'),
+      ),
     );
   }
 }
