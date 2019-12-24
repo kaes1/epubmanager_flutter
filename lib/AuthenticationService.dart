@@ -1,0 +1,13 @@
+
+
+class AuthenticationService {
+
+  login() {
+
+  }
+
+  logout() {
+
+  }
+
+}

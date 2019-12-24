@@ -1,0 +1,11 @@
+const String register = '/api/register';
+const String login = '/api/secure/login';
+const String logout = '/logout';
+const String userInfo = '/api/user-info';
+const String bookList = '/api/secure/book-list';
+const String books = '/api/books';
+const String booksSearch = '/api/books';
+const String booksAdd = '/api/secure/add-book';
+const String comments = '/api/comments';
+const String commentsAdd = '/api/secure/comments';
+const String tags = '/api/tags';
