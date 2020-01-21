@@ -43,48 +43,84 @@ class LoginScreenState extends State<LoginScreen> {
       appBar: AppBar(
         title: Text('Please login'),
       ),
-      body: Card(
-          elevation: 10.0,
-          margin: EdgeInsets.all(15.0),
-          child: Padding(
-              padding: EdgeInsets.fromLTRB(15.0, 5.0, 15.0, 5.0),
-              child: Form(
-                key: formKey,
-                child: Column(
+      body: Center(
+          child: ListView(
+            shrinkWrap: true,
+            padding: EdgeInsets.all(15.0),
+              children: <Widget>[
+              Center(
+                child: Card(
+                    elevation: 8.0,
+                    margin: EdgeInsets.all(15.0),
+                    child: Padding(
+                        padding: EdgeInsets.all(10.0),
+                        child: Form(
+                          key: formKey,
+                          child: Column(
+                            children: <Widget>[
+                              TextFormField(
+                                controller: usernameController,
+                                decoration: InputDecoration(prefixIcon: Icon(Icons.person), labelText: 'Username'),
+                                validator: (value) {
+                                  if (value.isEmpty)
+                                    return 'Username cannot be empty';
+                                  else
+                                    return null;
+                                },
+                              ),
+                              SizedBox(
+                                height: 15.0,
+                              ),
+                              TextFormField(
+                                  controller: passwordController,
+                                  decoration: InputDecoration(prefixIcon: Icon(Icons.lock), labelText: 'Password'),
+                                  obscureText: true,
+                                  validator: (value) {
+                                    if (value.isEmpty)
+                                      return 'Password cannot be empty';
+                                    else if (value.length < 3)
+                                      return 'Password needs to be at least 3 characters long';
+                                    else
+                                      return null;
+                                  }),
+                              SizedBox(
+                                height: 15.0,
+                              ),
+                          Material(
+                            borderRadius: BorderRadius.circular(30.0),
+                            child: MaterialButton(
+                              onPressed: login,
+                              color: Colors.deepPurple,
+                              minWidth: 200,
+                              child: Text(
+                                'LOGIN',
+                                style: TextStyle(
+                                  fontSize: 16.0,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          )
+                            ],
+                          ),
+                        ))),
+              ),
+                SizedBox(
+                  height: 25.0,
+                ),
+                Row(
                   children: <Widget>[
-                    TextFormField(
-                      controller: usernameController,
-                      decoration: InputDecoration(labelText: 'Username'),
-                      validator: (value) {
-                        if (value.isEmpty)
-                          return 'Username cannot be empty';
-                        else
-                          return null;
-                      },
+                    Expanded(child: Text("Don't have an account?")),
+                    GestureDetector(
+                      child: Text( "Register",
+                          style: TextStyle(color: Colors.deepPurple)),
+                      onTap: register,
                     ),
-                    TextFormField(
-                        controller: passwordController,
-                        decoration: InputDecoration(labelText: 'Password'),
-                        obscureText: true,
-                        validator: (value) {
-                          if (value.isEmpty)
-                            return 'Password cannot be empty';
-                          else if (value.length < 3)
-                            return 'Password needs to be at least 3 characters long';
-                          else
-                            return null;
-                        }),
-                    RaisedButton(
-                      onPressed: login,
-                      child: Text('Login'),
-                    ),
-                    RaisedButton(
-                      onPressed: logout,
-                      child: Text('Logout'),
-                    )
                   ],
                 ),
-              ))),
+              ],
+          ),
+      ),
     );
   }
 
@@ -109,6 +145,11 @@ class LoginScreenState extends State<LoginScreen> {
         }
       });
     }
+  }
+
+  register(){
+    log('Navigate to /register');
+    Navigator.pushReplacementNamed(context, '/register');
   }
 
   logout() {

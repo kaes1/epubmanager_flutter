@@ -5,7 +5,8 @@ import 'package:http/http.dart';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  final Uri serverUri = Uri.parse('http://192.168.0.120:8080');
+  //final Uri serverUri = Uri.parse('http://192.168.0.103:8080');
+  final Uri serverUri = Uri.parse('http://192.168.43.71:8080');
 
   Map<String, String> _headers = Map();
 
