@@ -169,8 +169,7 @@ class RegisterScreenState extends State<RegisterScreen> {
       String password = passwordController.text.trim();
 
       UserRegistrationRequest userRegistrationRequest = new UserRegistrationRequest(username, password);
-      apiService
-          .post(ApiEndpoints.register, json.encode(userRegistrationRequest.toJson()))
+      apiService.post(ApiEndpoints.register, userRegistrationRequest)
           .then((response) {
         UserRegistrationResponse userRegistrationResponse = new UserRegistrationResponse.fromJson(json.decode(utf8.decode(response.bodyBytes)));
         log('response.body: ${json.decode(utf8.decode(response.bodyBytes))}');

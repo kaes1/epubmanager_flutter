@@ -1,6 +1,6 @@
 # epubmanager_flutter
 
-Mobile version of epubmanager
+Mobile client for epubmanager.
 
 ## Getting Started
 

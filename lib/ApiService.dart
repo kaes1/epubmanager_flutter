@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
@@ -10,7 +11,10 @@ class ApiService {
   //oladyr IP using phone as access point
   final Uri serverUri = Uri.parse('http://192.168.43.71:8080');
 
-  Map<String, String> _headers = Map();
+  //KS IP
+  //final Uri serverUri = Uri.parse('http://192.168.0.120:8080');
+
+  Map<String, String> _headers = {"content-type" : "application/json"};
 
   void _updateHeaders(Response response) {
     String setCookie = response.headers['set-cookie'];
@@ -41,8 +45,9 @@ class ApiService {
   }
 
   Future<Response> post(String path, body) async {
+    _headers.forEach((key,value) => log(key +':'+value) );
     final Response response =
-        await http.post(serverUri.resolve(path), headers: {}, body: body);
+        await http.post(serverUri.resolve(path), headers: _headers, body: jsonEncode(body));
     _updateHeaders(response);
     return response;
   }
