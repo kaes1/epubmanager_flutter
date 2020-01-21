@@ -138,7 +138,7 @@ class RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  void _showRegistrationDialog(String title, String message) {
+  void _showRegistrationDialog(String title, String message, bool goToLogin) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -150,6 +150,8 @@ class RegisterScreenState extends State<RegisterScreen> {
               child: new Text("Close"),
               onPressed: () {
                 Navigator.of(context).pop();
+                if(goToLogin)
+                  Navigator.pushReplacementNamed(context, '/login');
               },
             ),
           ],
@@ -174,10 +176,9 @@ class RegisterScreenState extends State<RegisterScreen> {
         UserRegistrationResponse userRegistrationResponse = new UserRegistrationResponse.fromJson(json.decode(utf8.decode(response.bodyBytes)));
         log('response.body: ${json.decode(utf8.decode(response.bodyBytes))}');
         if (userRegistrationResponse.success) {
-          _showRegistrationDialog('Registration succedded' ,'Account has been created');
-          Navigator.pushReplacementNamed(context, '/login');
+          _showRegistrationDialog('Registration succedded' ,'${userRegistrationResponse.message}', true);
         } else {
-          _showRegistrationDialog('Registration failed' ,'${userRegistrationResponse.message}');
+          _showRegistrationDialog('Registration failed' ,'${userRegistrationResponse.message}', false);
         }
       });
 
