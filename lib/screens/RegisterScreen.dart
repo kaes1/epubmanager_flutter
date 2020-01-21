@@ -151,7 +151,7 @@ class RegisterScreenState extends State<RegisterScreen> {
               onPressed: () {
                 Navigator.of(context).pop();
                 if(goToLogin)
-                  Navigator.pushReplacementNamed(context, '/login');
+                 login();
               },
             ),
           ],
