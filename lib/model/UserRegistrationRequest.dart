@@ -3,4 +3,10 @@ class UserRegistrationRequest {
   final String password;
 
   UserRegistrationRequest(this.username, this.password);
+
+  Map<String, dynamic> toJson() =>
+      {
+        'username': this.username,
+        'password': this.password,
+      };
 }
