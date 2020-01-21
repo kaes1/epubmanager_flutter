@@ -5,7 +5,9 @@ import 'package:http/http.dart';
 import 'package:http/http.dart' as http;
 
 class ApiService {
+  //oladyr IP using WIFI in DS Barbara
   //final Uri serverUri = Uri.parse('http://192.168.0.103:8080');
+  //oladyr IP using phone as access point
   final Uri serverUri = Uri.parse('http://192.168.43.71:8080');
 
   Map<String, String> _headers = Map();
