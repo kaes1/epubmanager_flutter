@@ -111,9 +111,21 @@ class BookSearchScreenState extends State<BookSearchScreen> {
 
   Widget buildBody(){
     if(_booksPage != null){
-      return ListView(
-        children: _isSearching ? _buildSearchList() : _buildList(),
-      );
+      if(_isSearching){
+        if(_buildSearchList().isEmpty){
+          return Center(
+            child: new Text('No results to display!', style: new TextStyle(fontSize: 20, color: Colors.red)),
+          );
+        } else {
+          return ListView(
+            children: _buildSearchList(),
+          );
+        }
+      } else {
+        return ListView(
+          children: _buildList(),
+        );
+      }
     } else {
       return Center(
         child: new Text('No results to display!', style: new TextStyle(fontSize: 20, color: Colors.red)),
