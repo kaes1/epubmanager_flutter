@@ -154,10 +154,6 @@ class BookSearchScreenState extends State<BookSearchScreen> {
     });
   }
 
-  _displayBookDetails(Book book) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => BookDetailsScreen(book: book)));
-  }
-
 }
 
 
