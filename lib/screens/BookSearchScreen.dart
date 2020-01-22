@@ -110,7 +110,11 @@ class BookSearchScreenState extends State<BookSearchScreen> {
   }
 
   Widget buildBody(){
-    if(_booksPage != null){
+    if(_booksPage == null || _booksPage.content.isEmpty){
+      return Center(
+        child: new Text('No results to display!', style: new TextStyle(fontSize: 20, color: Colors.red)),
+      );
+    } else {
       if(_isSearching){
         if(_buildSearchList().isEmpty){
           return Center(
@@ -126,10 +130,6 @@ class BookSearchScreenState extends State<BookSearchScreen> {
           children: _buildList(),
         );
       }
-    } else {
-      return Center(
-        child: new Text('No results to display!', style: new TextStyle(fontSize: 20, color: Colors.red)),
-      );
     }
   }
 
@@ -181,7 +181,15 @@ class ChildItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new ListTile(title: Text(this.book.title), subtitle: Text(this.book.author.name), onTap: () => _displayBookDetails(this.book, context));
+
+    String tags = '';
+
+    for(int i = 0; i < this.book.tags.length; i++){
+      if(i == 0) tags = this.book.tags[i].name;
+      else tags += (', ' + this.book.tags[i].name);
+    }
+
+    return new ListTile(title: Text(this.book.title), subtitle: Text(this.book.author.name + '\n' + tags), isThreeLine: true, onTap: () => _displayBookDetails(this.book, context));
   }
 
   _displayBookDetails(Book book, BuildContext context) {
