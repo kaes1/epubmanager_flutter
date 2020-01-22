@@ -73,7 +73,6 @@ class BookSearchScreenState extends State<BookSearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    //_booksPage = null;//usunąć potem!
 
     return Scaffold(
       key: key,
@@ -106,18 +105,24 @@ class BookSearchScreenState extends State<BookSearchScreen> {
           },),
         ],
       ),
-      body: ListView(
-        children: _isSearching ? _buildSearchList() : _buildList(),
-      ),
+      body: buildBody(),
     );
   }
 
-
+  Widget buildBody(){
+    if(_booksPage != null){
+      return ListView(
+        children: _isSearching ? _buildSearchList() : _buildList(),
+      );
+    } else {
+      return Center(
+        child: new Text('No results to display!', style: new TextStyle(fontSize: 20, color: Colors.red)),
+      );
+    }
+  }
 
   List<ChildItem> _buildList() {
-    if (_booksPage != null)
-      return _booksPage.content.map((book) => new ChildItem(book)).toList();
-    else return [];
+    return _booksPage.content.map((book) => new ChildItem(book)).toList();
   }
 
   List<ChildItem> _buildSearchList() {
