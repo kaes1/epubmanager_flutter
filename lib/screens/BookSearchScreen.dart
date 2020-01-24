@@ -1,10 +1,9 @@
-import 'dart:convert';
 import 'dart:developer';
 
-import 'package:epubmanager_flutter/ApiEndpoints.dart' as ApiEndpoints;
-import 'package:epubmanager_flutter/ApiService.dart';
+import 'package:epubmanager_flutter/book/BookService.dart';
 import 'package:epubmanager_flutter/model/Book.dart';
 import 'package:epubmanager_flutter/model/BooksPage.dart';
+import 'package:epubmanager_flutter/model/Tag.dart';
 import 'package:epubmanager_flutter/screens/BookDetailsScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -19,160 +18,132 @@ class BookSearchScreen extends StatefulWidget {
 }
 
 class BookSearchScreenState extends State<BookSearchScreen> {
-  ApiService apiService = GetIt.instance.get<ApiService>();
+  final BookService bookService = GetIt.instance.get<BookService>();
 
-  BooksPage _booksPage;
-  final key = GlobalKey<ScaffoldState>();
-  final TextEditingController _searchQuery = TextEditingController();
-  bool _isSearching = false;
-  String _searchText = "";
-  Widget appBarTitle = new Text('Search for books', style: new TextStyle(color: Colors.white),);
-  Icon actionIcon = new Icon(Icons.search, color: Colors.white,);
+  List<Book> _books;
+  int _currentPage = 0;
+  int _lastPage = 50;
 
+  final TextEditingController _titleSearchController = TextEditingController();
+
+  Icon actionIcon = new Icon(
+    Icons.search,
+    color: Colors.white,
+  );
+
+  List<Tag> _selectedTags = [];
+  String _sortDirection = 'ASCENDING';
+  String _sortType = 'NONE';
+
+  bool _initialLoading = true;
 
   @override
   void initState() {
     super.initState();
-    //test search
-    Map<String, dynamic> queryParameters = {
-      'title': '',
-      'author': '',
-      'pageNumber': '0',
-      'pageSize': '5',
-      'sort': 'NONE',
-      'sortDirection': 'ASCENDING',
-      'tags': []
-    };
-
-    apiService.get(ApiEndpoints.booksSearch, queryParameters).then( (response) {
-      log('Test Search StatusCode: ${response.statusCode}');
-      log('Test Search body: ${response.body}');
-      setState(() {
-        _booksPage = BooksPage.fromJson(json.decode(utf8.decode(response.bodyBytes)));
-        log('booksPage size: ${_booksPage.size}');
-        log('booksPage content: ${_booksPage.content}');
-
-        _searchQuery.addListener(() {
-          if (_searchQuery.text.isEmpty) {
-            setState(() {
-              _isSearching = false;
-              _searchText = "";
-            });
-          }
-          else {
-            setState(() {
-              _isSearching = true;
-              _searchText = _searchQuery.text;
-            });
-          }
-        });
-      });
-    });
-
+    this._resetBooks();
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-      key: key,
       drawer: MenuDrawer(),
       appBar: AppBar(
-        title: appBarTitle,
+        title: new TextField(
+          onChanged: (s) => this._resetBooks(),
+          controller: _titleSearchController,
+          style: new TextStyle(color: Colors.white),
+          decoration: new InputDecoration(
+              hintText: 'Search...',
+              hintStyle: new TextStyle(color: Colors.white),
+              prefixIcon: new Icon(Icons.search, color: Colors.white),
+              enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white)),
+              focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white))),
+        ),
         actions: <Widget>[
-          new IconButton(icon: actionIcon, onPressed: () {
-            setState(() {
-              if (this.actionIcon.icon == Icons.search) {
-                this.actionIcon = new Icon(Icons.close, color: Colors.white,);
-                this.appBarTitle = new TextField(
-                  controller: _searchQuery,
-                  style: new TextStyle(
-                    color: Colors.white,
-
-                  ),
-                  decoration: new InputDecoration(
-                      prefixIcon: new Icon(Icons.search, color: Colors.white),
-                      hintText: 'Search...',
-                      hintStyle: new TextStyle(color: Colors.white)
-                  ),
-                );
-                _handleSearchStart();
-              }
-              else {
-                _handleSearchEnd();
-              }
-            });
-          },),
+          new IconButton(
+            icon: actionIcon,
+            onPressed: () {
+              setState(() {
+                if (this.actionIcon.icon == Icons.search) {
+                  this.actionIcon = new Icon(Icons.close, color: Colors.white);
+                } else {
+                  this.actionIcon = new Icon(Icons.search, color: Colors.white);
+                }
+              });
+            },
+          ),
         ],
       ),
       body: buildBody(),
     );
   }
 
-  Widget buildBody(){
-    if(_booksPage == null || _booksPage.content.isEmpty){
+  Widget buildBody() {
+    if (_initialLoading){
       return Center(
-        child: new Text('No results to display!', style: new TextStyle(fontSize: 20, color: Colors.red)),
+          heightFactor: 10, child: CircularProgressIndicator());
+    } else if (_books == null || _books.isEmpty) {
+      return Center(
+        child: new Text('No results to display!',
+            style: new TextStyle(fontSize: 20, color: Colors.red)),
       );
     } else {
-      if(_isSearching){
-        if(_buildSearchList().isEmpty){
-          return Center(
-            child: new Text('No results to display!', style: new TextStyle(fontSize: 20, color: Colors.red)),
-          );
-        } else {
-          return ListView(
-            children: _buildSearchList(),
-          );
-        }
-      } else {
-        return ListView(
-          children: _buildList(),
-        );
-      }
+      return ListView.builder(
+          itemCount: _books.length + 1,
+          itemBuilder: (context, index) {
+            if (index < _books.length) {
+              return new ChildItem(_books[index]);
+            } else if (_currentPage < _lastPage) {
+              _fetchMoreBooks();
+              return Center(
+                  heightFactor: 3, child: CircularProgressIndicator());
+            } else {
+              return null;
+            }
+          });
     }
   }
 
-  List<ChildItem> _buildList() {
-    return _booksPage.content.map((book) => new ChildItem(book)).toList();
+  Future<BooksPage> _getBooksPage(int pageNumber) async {
+    log('Getting book page ${pageNumber}');
+    BooksPage booksPage = await bookService.findBooks(
+        _titleSearchController.text,
+        '',
+        _selectedTags.map((tag) => tag.name).toList(),
+        pageNumber,
+        15,
+        _sortType,
+        _sortDirection);
+    this._lastPage = booksPage.totalPages - 1;
+    log('Current page: ${pageNumber}, Last Page: ${_lastPage}');
+    return booksPage;
   }
 
-  List<ChildItem> _buildSearchList() {
-    if (_searchText.isEmpty) {
-      return _booksPage.content.map((book) => new ChildItem(book))
-          .toList();
-    }
-    else {
-      List<Book> _searchList = List();
-      for (int i = 0; i < _booksPage.content.length; i++) {
-        Book  foundBook = _booksPage.content.elementAt(i);
-        if (foundBook.title.toLowerCase().contains(_searchText.toLowerCase())) {
-          _searchList.add(foundBook);
-        }
-      }
-      return _searchList.map((book) => new ChildItem(book))
-          .toList();
-    }
-  }
-
-  void _handleSearchStart() {
-    setState(() {
-      _isSearching = true;
+  void _resetBooks() {
+    this._books = [];
+    this._currentPage = 0;
+    this._lastPage = 50;
+    this._getBooksPage(_currentPage).then((booksPage) {
+      this.setState(() {
+        this._books.addAll(booksPage.content);
+        _initialLoading = false;
+      });
     });
   }
 
-  void _handleSearchEnd() {
-    setState(() {
-      this.actionIcon = new Icon(Icons.search, color: Colors.white,);
-      this.appBarTitle =
-      new Text('Search for books', style: new TextStyle(color: Colors.white),);
-      _isSearching = false;
-      _searchQuery.clear();
-    });
+  void _fetchMoreBooks() {
+    if (_currentPage < _lastPage) {
+      _currentPage++;
+      this._getBooksPage(_currentPage).then((booksPage) {
+        this.setState(() {
+          this._books.addAll(booksPage.content);
+        });
+      });
+    }
   }
-
 }
-
 
 class ChildItem extends StatelessWidget {
   final Book book;
@@ -181,19 +152,17 @@ class ChildItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String tags = this.book.tags.map((f) => f.name).join(', ');
 
-    String tags = '';
-
-    for(int i = 0; i < this.book.tags.length; i++){
-      if(i == 0) tags = this.book.tags[i].name;
-      else tags += (', ' + this.book.tags[i].name);
-    }
-
-    return new ListTile(title: Text(this.book.title), subtitle: Text(this.book.author.name + '\n' + tags), isThreeLine: true, onTap: () => _displayBookDetails(this.book, context));
+    return new ListTile(
+        title: Text(this.book.title),
+        subtitle: Text(this.book.author.name + '\n' + tags),
+        isThreeLine: true,
+        onTap: () => _displayBookDetails(this.book, context));
   }
 
   _displayBookDetails(Book book, BuildContext context) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => BookDetailsScreen(book: book)));
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => BookDetailsScreen(book: book)));
   }
-
 }

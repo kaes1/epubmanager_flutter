@@ -7,7 +7,7 @@ import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
 import 'dart:convert';
 import '../MenuDrawer.dart';
-import 'package:epubmanager_flutter/ApiEndpoints.dart' as ApiEndpoints;
+import 'package:epubmanager_flutter/ApiEndpoints.dart';
 
 import 'BookDetailsScreen.dart';
 

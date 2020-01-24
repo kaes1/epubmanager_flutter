@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'dart:developer';
 import '../MenuDrawer.dart';
-import 'package:epubmanager_flutter/ApiEndpoints.dart' as ApiEndpoints;
+import 'package:epubmanager_flutter/ApiEndpoints.dart';
 import 'package:epubmanager_flutter/ApiService.dart';
 import 'package:get_it/get_it.dart';
 import '../model/UserRegistrationRequest.dart';

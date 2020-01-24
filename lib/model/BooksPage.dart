@@ -11,4 +11,6 @@ class BooksPage {
         totalPages = json['totalPages'],
         totalElements = json['totalElements'],
         size = json['size'];
+
+
 }
