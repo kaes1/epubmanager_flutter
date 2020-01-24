@@ -7,7 +7,9 @@ import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
 import 'dart:convert';
 import '../MenuDrawer.dart';
-import 'package:epubmanager_flutter/ApiEndpoints.dart' as ApiEndpoints;
+import 'package:epubmanager_flutter/ApiEndpoints.dart';
+
+import 'BookDetailsScreen.dart';
 
 class BookListScreen extends StatefulWidget {
   @override
@@ -53,7 +55,7 @@ class BookListScreenState extends State<BookListScreen> {
             ],
           ),
           onTap: () {
-            //todo display details
+            Navigator.push(context, MaterialPageRoute(builder: (context) => BookDetailsScreen(book: entry.book)));
             Navigator.pushNamed(context, '/book-details');
           });
     }).toList();

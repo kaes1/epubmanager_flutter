@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 
-import 'package:epubmanager_flutter/ApiEndpoints.dart' as ApiEndpoints;
+import 'package:epubmanager_flutter/ApiEndpoints.dart';
 import 'package:epubmanager_flutter/ApiService.dart';
 import 'package:epubmanager_flutter/StateService.dart';
 import 'package:flutter/material.dart';

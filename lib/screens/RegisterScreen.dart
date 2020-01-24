@@ -1,6 +1,13 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'dart:developer';
 import '../MenuDrawer.dart';
+import 'package:epubmanager_flutter/ApiEndpoints.dart';
+import 'package:epubmanager_flutter/ApiService.dart';
+import 'package:get_it/get_it.dart';
+import '../model/UserRegistrationRequest.dart';
+import '../model/UserRegistrationResponse.dart';
+
 
 class RegisterScreen extends StatefulWidget {
   @override
@@ -10,6 +17,8 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class RegisterScreenState extends State<RegisterScreen> {
+  ApiService apiService = GetIt.instance.get<ApiService>();
+
   final formKey = GlobalKey<FormState>();
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
@@ -21,6 +30,11 @@ class RegisterScreenState extends State<RegisterScreen> {
     passwordController.dispose();
     passwordConfirmController.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
@@ -124,6 +138,28 @@ class RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
+  void _showRegistrationDialog(String title, String message, bool goToLogin) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: new Text(title),
+          content: new Text(message),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text("Close"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                if(goToLogin)
+                 login();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   login(){
     log('Navigate to /login');
     Navigator.pushReplacementNamed(context, '/login');
@@ -133,6 +169,19 @@ class RegisterScreenState extends State<RegisterScreen> {
     if (formKey.currentState.validate()) {
       String username = usernameController.text.trim();
       String password = passwordController.text.trim();
+
+      UserRegistrationRequest userRegistrationRequest = new UserRegistrationRequest(username, password);
+      apiService.post(ApiEndpoints.register, userRegistrationRequest)
+          .then((response) {
+        UserRegistrationResponse userRegistrationResponse = new UserRegistrationResponse.fromJson(json.decode(utf8.decode(response.bodyBytes)));
+        log('response.body: ${json.decode(utf8.decode(response.bodyBytes))}');
+        if (userRegistrationResponse.success) {
+          _showRegistrationDialog('Registration succedded' ,'${userRegistrationResponse.message}', true);
+        } else {
+          _showRegistrationDialog('Registration failed' ,'${userRegistrationResponse.message}', false);
+        }
+      });
+
     }
   }
 }
