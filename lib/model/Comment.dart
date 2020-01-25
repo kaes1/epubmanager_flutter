@@ -8,7 +8,7 @@ class Comment {
       : id = json['id'],
         author = json['author'],
         message = json['message'],
-        datePosted = (json['datePosted']).toString().substring(0,10);
+        datePosted = (json['datePosted']).toString();
 
   static List<Comment> listFromJson(List jsonList) {
     return jsonList.map((tagJson) => Comment.fromJson(tagJson)).toList();

@@ -1,4 +1,5 @@
 import 'package:epubmanager_flutter/ApiService.dart';
+import 'package:epubmanager_flutter/book/BookListService.dart';
 import 'package:epubmanager_flutter/book/BookService.dart';
 import 'package:epubmanager_flutter/StateService.dart';
 import 'package:epubmanager_flutter/screens/BookDetailsScreen.dart';
@@ -14,6 +15,7 @@ import 'package:get_it/get_it.dart';
 void main() {
   GetIt.instance.registerSingleton<StateService>(StateService());
   GetIt.instance.registerSingleton<ApiService>(ApiService());
+  GetIt.instance.registerSingleton<BookListService>(BookListService());
   GetIt.instance.registerSingleton<BookService>(BookService());
   runApp(MyApp());
 
@@ -29,7 +31,7 @@ class MyApp extends StatelessWidget {
         '/register': (context) => RegisterScreen(),
         '/book-list': (context) => BookListScreen(),
         '/book-upload': (context) => BookUploadScreen(),
-        '/book-details': (context) => BookDetailsScreen(),
+//        '/book-details': (context) => BookDetailsScreen(),
         '/search': (context) => BookSearchScreen(),
       },
       title: 'epubmanager',
