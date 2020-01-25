@@ -31,7 +31,7 @@ class ApiService {
 
   //todo handle bad responses (401, 403 etc)
 
-  Future<Response> get(String path, [Map<String, dynamic> queryParameters]) async {
+  Future<dynamic> get(String path, [Map<String, dynamic> queryParameters]) async {
     final Response response = await http.get(
         serverUri.resolveUri(Uri(path: path, queryParameters: queryParameters)),
         headers: _headers);
@@ -48,7 +48,7 @@ class ApiService {
       return Future.error('Error ${response.statusCode}');
     }
 
-    return response;
+    return json.decode(utf8.decode(response.bodyBytes));
   }
 
   Future<Response> getWithBasicAuth(String path, String basicAuth) async {
@@ -73,5 +73,9 @@ class ApiService {
         await http.delete(serverUri.resolve(path), headers: _headers);
     _updateHeaders(response);
     return response;
+  }
+
+  void forgetSessionCookie() {
+    _headers.remove('cookie');
   }
 }

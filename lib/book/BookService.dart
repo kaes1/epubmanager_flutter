@@ -26,7 +26,7 @@ class BookService {
     return apiService
         .get(ApiEndpoints.booksSearch, queryParameters)
         .then((response) {
-          return BooksPage.fromJson(json.decode(utf8.decode(response.bodyBytes)));
+          return BooksPage.fromJson(response);
         });
   }
 }

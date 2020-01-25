@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:epubmanager_flutter/ApiService.dart';
+import 'package:epubmanager_flutter/model/BookListEdit.dart';
+import 'package:epubmanager_flutter/model/BookListEntry.dart';
 import 'package:epubmanager_flutter/model/BooksPage.dart';
 import 'package:epubmanager_flutter/model/Status.dart';
 import 'package:get_it/get_it.dart';
@@ -12,15 +14,30 @@ class BookListService {
 
 
 
-  void fetchBookList() {
-    //TODO fetch book list and return OR save in this service.
-    apiService.get(ApiEndpoints.bookList).then((response) {});
+
+  Future<BookListEntry> getBookListEntry(int bookId) {
+    return apiService.get(ApiEndpoints.bookList).then((response) {
+      return BookListEntry.listFromJson(
+          response).firstWhere((entry) => entry.book.id == bookId, orElse: () => null);
+    });
   }
 
 
-  Future editBookListEntry(int bookId, int rating, Status status) {
-    //TODO create bookListEdit DTO
-    var bookListEdit = null;
+  Future<List<BookListEntry>> getBookList() {
+    return apiService.get(ApiEndpoints.bookList).then((response) {
+        return BookListEntry.listFromJson(
+            response);
+    });
+  }
+
+//  void fetchBookList() {
+//    //TODO fetch book list and return OR save in this service.
+//    apiService.get(ApiEndpoints.bookList).then((response) {});
+//  }
+
+
+  Future editBookListEntry(int bookId, int rating, String status) {
+    BookListEdit bookListEdit = new BookListEdit(bookId, rating, status);
     return apiService.post(ApiEndpoints.bookList, bookListEdit);
   }
 

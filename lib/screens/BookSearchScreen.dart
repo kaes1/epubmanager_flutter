@@ -163,6 +163,6 @@ class ChildItem extends StatelessWidget {
 
   _displayBookDetails(Book book, BuildContext context) {
     Navigator.push(context,
-        MaterialPageRoute(builder: (context) => BookDetailsScreen(book: book)));
+        MaterialPageRoute(builder: (context) => BookDetailsScreen(book)));
   }
 }

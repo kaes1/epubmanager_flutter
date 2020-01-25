@@ -174,7 +174,6 @@ class RegisterScreenState extends State<RegisterScreen> {
       apiService.post(ApiEndpoints.register, userRegistrationRequest)
           .then((response) {
         UserRegistrationResponse userRegistrationResponse = new UserRegistrationResponse.fromJson(json.decode(utf8.decode(response.bodyBytes)));
-        log('response.body: ${json.decode(utf8.decode(response.bodyBytes))}');
         if (userRegistrationResponse.success) {
           _showRegistrationDialog('Registration succedded' ,'${userRegistrationResponse.message}', true);
         } else {

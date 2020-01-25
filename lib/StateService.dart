@@ -3,7 +3,9 @@ import 'package:rxdart/rxdart.dart';
 class StateService {
 
   BehaviorSubject _loggedInSubject = BehaviorSubject<bool>.seeded(false);
-  bool registerSuccessfulFlag = false;
+  bool _registerSuccessfulFlag = false;
+
+  String _username = '';
 
   Stream getLoggedIn() {
     return _loggedInSubject.stream;
@@ -14,15 +16,23 @@ class StateService {
   }
 
   void setLoggedIn(bool loggedIn) {
-    this._loggedInSubject.add(loggedIn);
+    _loggedInSubject.add(loggedIn);
+  }
+
+  void setUsername(String username) {
+     _username = username;
+  }
+
+  String getUsername() {
+    return _username;
   }
 
   void setSuccessfulRegisterFlag(bool state){
-    this.registerSuccessfulFlag = state;
+    _registerSuccessfulFlag = state;
   }
 
   bool getSuccessfulRegisterFlag() {
-    return this.registerSuccessfulFlag;
+    return _registerSuccessfulFlag;
   }
 }
 

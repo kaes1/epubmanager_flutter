@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:epubmanager_flutter/ApiService.dart';
+import 'package:epubmanager_flutter/book/BookListService.dart';
 import 'package:epubmanager_flutter/model/BookListEntry.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -19,26 +20,33 @@ class BookListScreen extends StatefulWidget {
 }
 
 class BookListScreenState extends State<BookListScreen> {
-  ApiService apiService = GetIt.instance.get<ApiService>();
+  //TODO display message when booklist is empty.
+  final BookListService _bookListService = GetIt.instance.get<BookListService>();
+  final ApiService _apiService = GetIt.instance.get<ApiService>();
 
-  List<BookListEntry> bookList = [];
+  List<BookListEntry> _bookList = [];
 
   @override
   void initState() {
     super.initState();
+    _fetchBookList();
+  }
 
-    apiService.get(ApiEndpoints.bookList).then((response) {
-      setState(() {
-        bookList = BookListEntry.listFromJson(
-            json.decode(utf8.decode(response.bodyBytes)));
-      });
-      log('response.body: ${json.decode(utf8.decode(response.bodyBytes))}');
-      log('bookList length: ${bookList.length}');
-    });
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      drawer: MenuDrawer(),
+      appBar: AppBar(
+        title: Text('My book list'),
+      ),
+      body: ListView(
+        children: generateTiles(),
+      ),
+    );
   }
 
   List<Widget> generateTiles() {
-    return bookList.map((entry) {
+    return _bookList.map((entry) {
       return ListTile(
           title: Text(entry.book.title),
           subtitle: Text(entry.book.author.name),
@@ -55,22 +63,16 @@ class BookListScreenState extends State<BookListScreen> {
             ],
           ),
           onTap: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => BookDetailsScreen(book: entry.book)));
-            Navigator.pushNamed(context, '/book-details');
+            Navigator.push(context, MaterialPageRoute(builder: (context) => BookDetailsScreen(entry.book)));
           });
     }).toList();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: MenuDrawer(),
-      appBar: AppBar(
-        title: Text('My book list'),
-      ),
-      body: ListView(
-        children: generateTiles(),
-      ),
-    );
+  void _fetchBookList() {
+    _bookListService.getBookList().then((bookList){
+      setState(() {
+        this._bookList = bookList;
+      });
+    });
   }
 }
