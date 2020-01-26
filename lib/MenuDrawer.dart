@@ -61,6 +61,7 @@ class MenuDrawer extends StatelessWidget {
           if (!this._stateService.isloggedIn())
             _createDrawerItem(
                 Icons.person_add, 'Register',() => _navigate('/register', context)),
+          if (!this._stateService.isloggedIn()) _divider(),
         ],
       ),
     );

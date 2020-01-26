@@ -1,10 +1,8 @@
-import 'dart:convert';
-import 'dart:developer';
-
 import 'package:epubmanager_flutter/ApiEndpoints.dart';
 import 'package:epubmanager_flutter/ApiService.dart';
 import 'package:epubmanager_flutter/StateService.dart';
 import 'package:epubmanager_flutter/book/BookListService.dart';
+import 'package:epubmanager_flutter/book/BookService.dart';
 import 'package:epubmanager_flutter/model/Book.dart';
 import 'package:epubmanager_flutter/model/BookListEntry.dart';
 import 'package:epubmanager_flutter/model/Comment.dart';
@@ -14,9 +12,9 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
 class BookDetailsScreen extends StatefulWidget {
-  final Book _book;
+  final int _bookId;
 
-  BookDetailsScreen(this._book);
+  BookDetailsScreen(this._bookId);
 
   @override
   State<StatefulWidget> createState() {
@@ -25,28 +23,24 @@ class BookDetailsScreen extends StatefulWidget {
 }
 
 class BookDetailsScreenState extends State<BookDetailsScreen> {
-  //todo retrieve bookListEntry for logged in user (if logged in) and display values.
   final StateService _stateService = GetIt.instance.get<StateService>();
   final ApiService _apiService = GetIt.instance.get<ApiService>();
   final BookListService _bookListService =
-      GetIt.instance.get<BookListService>();
-
-  //todo pass bookId and retrieve book from api??
-
-  //todo rating 2 decimal places!
-
-  //todo after adding book, fetch book list entry
+  GetIt.instance.get<BookListService>();
+  final BookService _bookService = GetIt.instance.get<BookService>();
 
   BookListEntry _bookListEntry = null;
+  Book _book = null;
 
   List<Comment> commentList = [];
 
   @override
   void initState() {
     super.initState();
-
-    _fetchBookListEntry();
-
+    _fetchBook();
+    if(_stateService.isloggedIn()) {
+      _fetchBookListEntry();
+    }
     _fetchComments();
   }
 
@@ -56,10 +50,10 @@ class BookDetailsScreenState extends State<BookDetailsScreen> {
       appBar: AppBar(title: Text('Book details')),
       body: new Column(
         children: <Widget>[
-          _bookDetailsCard(),
+          (_book == null) ? Center(heightFactor: 10, child: CircularProgressIndicator()) : _bookDetailsCard(),
           new Expanded(
             child: Container(
-              child: _buildCommentsList(),
+              child: (_book == null) ? Center(heightFactor: 10, child: CircularProgressIndicator()) : _buildCommentsList(),
             ),
           )
         ],
@@ -84,20 +78,20 @@ class BookDetailsScreenState extends State<BookDetailsScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 Text(
-                  widget._book.title,
+                  _book.title,
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 23),
                 ),
                 SizedBox(
                   height: 15.0,
                 ),
-                Text('Author: ' + widget._book.author.name,
+                Text('Author: ' + _book.author.name,
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 16)),
-                Text('Publisher: ' + widget._book.publisher,
+                Text('Publisher: ' + _book.publisher,
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 16)),
-                Text('Rating: ' + widget._book.rating.toString(),
+                Text('Rating: ' + _book.rating.toStringAsFixed(2),
                     textAlign: TextAlign.center, style: TextStyle(fontSize: 16))
               ],
             ),
@@ -119,9 +113,9 @@ class BookDetailsScreenState extends State<BookDetailsScreen> {
                               context: context,
                               builder: (BuildContext context) {
                                 return EditBookListDialog(
-                                  widget._book.id,
+                                  _book.id,
                                   _bookListEntry,
-                                  onClose: () => _fetchBookListEntry(),
+                                  onClose: () => _actualizeDisplayedInfo(),
                                 );
                               }),
                           color: Colors.deepPurple,
@@ -152,14 +146,7 @@ class BookDetailsScreenState extends State<BookDetailsScreen> {
   Widget _buildCommentsList() {
     if (commentList == null || commentList.isEmpty) {
       return new Center(
-        child: Column(
-          children: <Widget>[
-            SizedBox(
-              height: 50.0,
-            ),
-            Text('No comments to display', style: TextStyle(color: Colors.red)),
-          ],
-        ),
+        child: Text('No comments to display', style: TextStyle(color: Colors.red)),
       );
     } else {
       return ListView(
@@ -191,51 +178,55 @@ class BookDetailsScreenState extends State<BookDetailsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     Flexible(
-                        child: new TextField(
-                      controller: commentController,
-                      toolbarOptions: const ToolbarOptions(
-                          copy: true, paste: true, cut: true, selectAll: false),
-                      enableInteractiveSelection: true,
-                      autofocus: true,
-                      showCursor: true,
-                      maxLength: 200,
-                      maxLines: 7,
-                      keyboardType: TextInputType.multiline,
-                      decoration: new InputDecoration(
-                        border: InputBorder.none,
-                        filled: true,
-                        contentPadding: new EdgeInsets.only(
-                            left: 10.0, top: 10.0, bottom: 10.0, right: 10.0),
-                        hintText: ' add review',
-                        hintStyle: new TextStyle(
-                          color: Colors.grey.shade500,
-                          fontSize: 12.0,
-                          fontFamily: 'helvetica_neue_light',
+                      child: new TextField(
+                        controller: commentController,
+                        toolbarOptions: const ToolbarOptions(
+                            copy: true, paste: true, cut: true, selectAll: false),
+                        enableInteractiveSelection: true,
+                        autofocus: true,
+                        showCursor: true,
+                        maxLength: 200,
+                        maxLines: 7,
+                        keyboardType: TextInputType.multiline,
+                        decoration: new InputDecoration(
+                          border: InputBorder.none,
+                          filled: true,
+                          contentPadding: new EdgeInsets.only(
+                              left: 10.0, top: 10.0, bottom: 10.0, right: 10.0),
+                          hintText: ' add review',
+                          hintStyle: new TextStyle(
+                            color: Colors.grey.shade500,
+                            fontSize: 12.0,
+                            fontFamily: 'helvetica_neue_light',
+                          ),
                         ),
                       ),
-                    )),
+                    ),
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 23.0),
                       child: Row(
                         children: <Widget>[
-                          RaisedButton(
-                            child: new Text('ADD'),
-                            color: Colors.deepPurple,
-                            textColor: Colors.white,
-                            onPressed: () {
-                              _addComment(commentController.text);
-                            },
+                          Expanded(
+                            child: RaisedButton(
+                              child: new Text('ADD'),
+                              color: Colors.deepPurple,
+                              textColor: Colors.white,
+                              onPressed: () {
+                                _addComment(commentController.text);
+                              },
+                            ),
                           ),
                           SizedBox(
                             width: 10.0,
                           ),
-                          RaisedButton(
-                            child: new Text('CANCEL'),
-                            color: Colors.deepPurple,
-                            textColor: Colors.white,
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
+                          Expanded(
+                            child: RaisedButton(
+                              child: new Text('CANCEL'),
+                              color: Colors.deepPurple,
+                              textColor: Colors.white,
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
                           ),
                         ],
                       ),
@@ -249,10 +240,8 @@ class BookDetailsScreenState extends State<BookDetailsScreen> {
   }
 
   _addComment(String comment) {
-    if (comment.isEmpty) {
-      log('Comment cannot be empty');
-    } else {
-      NewComment newComment = new NewComment(widget._book.id, comment);
+    if (comment.isNotEmpty) {
+      NewComment newComment = new NewComment(_book.id, comment);
       _apiService.post(ApiEndpoints.commentsAdd, newComment).then((response) {
         _fetchComments();
       });
@@ -260,8 +249,21 @@ class BookDetailsScreenState extends State<BookDetailsScreen> {
     }
   }
 
+  void _actualizeDisplayedInfo(){
+    _fetchBook();
+    _fetchBookListEntry();
+  }
+
+  void _fetchBook(){
+    _bookService.getBook(widget._bookId).then((book) {
+      setState(() {
+        _book = book;
+      });
+    });
+  }
+
   void _fetchBookListEntry() {
-    _bookListService.getBookListEntry(widget._book.id).then((entry) {
+    _bookListService.getBookListEntry(widget._bookId).then((entry) {
       setState(() {
         _bookListEntry = entry;
       });
@@ -270,7 +272,7 @@ class BookDetailsScreenState extends State<BookDetailsScreen> {
 
   void _fetchComments() {
     _apiService
-        .get(ApiEndpoints.comments + '/' + widget._book.id.toString())
+        .get(ApiEndpoints.comments + '/' + widget._bookId.toString())
         .then((response) {
       setState(() {
         commentList =
@@ -297,7 +299,7 @@ class CommentsListItem extends StatelessWidget {
         decoration: BoxDecoration(color: Colors.white),
         child: ListTile(
           contentPadding:
-              EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+          EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
           title: Text(
             this.comment.author +
                 ' commented on ' +

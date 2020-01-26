@@ -1,10 +1,6 @@
-import 'dart:convert';
-
 import 'package:epubmanager_flutter/ApiService.dart';
 import 'package:epubmanager_flutter/model/BookListEdit.dart';
 import 'package:epubmanager_flutter/model/BookListEntry.dart';
-import 'package:epubmanager_flutter/model/BooksPage.dart';
-import 'package:epubmanager_flutter/model/Status.dart';
 import 'package:get_it/get_it.dart';
 import 'package:epubmanager_flutter/ApiEndpoints.dart';
 import 'package:http/http.dart';

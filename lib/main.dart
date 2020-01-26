@@ -36,6 +36,7 @@ class MyApp extends StatelessWidget {
       },
       title: 'epubmanager',
       theme: ThemeData(primarySwatch: Colors.deepPurple),
+      navigatorObservers: <NavigatorObserver>[routeObserver],
     );
   }
 }
