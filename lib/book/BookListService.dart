@@ -26,12 +26,6 @@ class BookListService {
     });
   }
 
-//  void fetchBookList() {
-//    //TODO fetch book list and return OR save in this service.
-//    apiService.get(ApiEndpoints.bookList).then((response) {});
-//  }
-
-
   Future editBookListEntry(int bookId, int rating, String status) {
     BookListEdit bookListEdit = new BookListEdit(bookId, rating, status);
     return apiService.post(ApiEndpoints.bookList, bookListEdit);

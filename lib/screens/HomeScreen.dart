@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:epubmanager_flutter/StateService.dart';
@@ -16,13 +17,21 @@ class HomeScreen extends StatefulWidget {
 class HomeScreenState extends State<HomeScreen> {
   final StateService _stateService = GetIt.instance.get<StateService>();
 
+  StreamSubscription _subscription;
+
   @override
   void initState() {
     super.initState();
     //Refresh state when loggedIn changes.
-    _stateService.getLoggedIn().listen((loggedIn) {
+    _subscription = _stateService.getLoggedIn().listen((loggedIn) {
       setState(() {});
     });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _subscription.cancel();
   }
 
   @override

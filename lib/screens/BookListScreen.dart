@@ -29,19 +29,21 @@ class BookListScreenState extends State<BookListScreen> with RouteAware {
     _fetchBookList();
   }
 
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     routeObserver.subscribe(this, ModalRoute.of(context));
   }
 
   @override
+  void didPopNext() {
+    _fetchBookList();
+  }
+
+  @override
   void dispose() {
     routeObserver.unsubscribe(this);
     super.dispose();
-  }
-
-  void didPopNext() {
-    _fetchBookList();
   }
 
   @override
