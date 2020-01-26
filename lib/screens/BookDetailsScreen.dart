@@ -38,7 +38,7 @@ class BookDetailsScreenState extends State<BookDetailsScreen> {
   void initState() {
     super.initState();
     _fetchBook();
-    if(_stateService.isloggedIn()) {
+    if(_stateService.isLoggedIn()) {
       _fetchBookListEntry();
     }
     _fetchComments();
