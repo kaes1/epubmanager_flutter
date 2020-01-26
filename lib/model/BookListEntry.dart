@@ -13,7 +13,6 @@ class BookListEntry {
         rating = json['rating'];
 
   static List<BookListEntry> listFromJson(List jsonList) {
-    log('listFromJson called');
     return jsonList.map((tagJson) => BookListEntry.fromJson(tagJson)).toList();
   }
 }

@@ -101,7 +101,7 @@ class BookDetailsScreenState extends State<BookDetailsScreen> {
                     textAlign: TextAlign.center, style: TextStyle(fontSize: 16))
               ],
             ),
-            if (_stateService.isloggedIn())
+            if (_stateService.isLoggedIn())
               Column(
                 children: <Widget>[
                   SizedBox(

@@ -8,38 +8,43 @@ import 'package:http/http.dart';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  StateService stateService = GetIt.instance.get<StateService>();
-
-  //oladyr IP using WIFI in DS Barbara
-  //final Uri serverUri = Uri.parse('http://192.168.0.103:8080');
-  //oladyr IP using phone as access point
-  final Uri serverUri = Uri.parse('http://192.168.43.71:8080');
+  final StateService _stateService = GetIt.instance.get<StateService>();
 
   //KS IP
-//  final Uri serverUri = Uri.parse('http://192.168.0.120:8080');
+  Uri _serverUri;
+  Map<String, String> _headers = {"content-type": "application/json"};
 
-  Map<String, String> _headers = {"content-type" : "application/json"};
+  ApiService() {
+    _stateService
+        .getServerAddress()
+        .listen((serverAddress) => _serverUri = Uri.parse(serverAddress));
+    _stateService.getCookie().listen((cookie) => _headers['cookie'] = cookie);
+  }
 
-  void _updateHeaders(Response response) {
+  void _updateCookieHeader(Response response) {
     String setCookie = response.headers['set-cookie'];
     if (setCookie != null) {
       int index = setCookie.indexOf(';');
-      _headers['cookie'] =
-          (index != -1) ? setCookie.substring(0, index) : setCookie;
+      _stateService
+          .setCookie((index != -1) ? setCookie.substring(0, index) : setCookie);
     }
   }
 
   //todo handle bad responses (401, 403 etc)
 
-  Future<dynamic> get(String path, [Map<String, dynamic> queryParameters]) async {
+  Future<dynamic> get(String path,
+      [Map<String, dynamic> queryParameters]) async {
+    log('ApiService get for $path called!');
     final Response response = await http.get(
-        serverUri.resolveUri(Uri(path: path, queryParameters: queryParameters)),
+        _serverUri
+            .resolveUri(Uri(path: path, queryParameters: queryParameters)),
         headers: _headers);
-    _updateHeaders(response);
+    _updateCookieHeader(response);
 
-    if (response.statusCode == HttpStatus.forbidden || response.statusCode == HttpStatus.unauthorized) {
+    if (response.statusCode == HttpStatus.forbidden ||
+        response.statusCode == HttpStatus.unauthorized) {
       log('Detected ${response.statusCode}!');
-      stateService.setLoggedIn(false);
+      _stateService.setLoggedIn(false);
       return Future.error('Authorization error ${response.statusCode}');
     }
 
@@ -55,27 +60,23 @@ class ApiService {
     Map<String, String> headers = Map.from(_headers);
     headers['authorization'] = basicAuth;
     final Response response =
-        await http.get(serverUri.resolve(path), headers: headers);
-    _updateHeaders(response);
+        await http.get(_serverUri.resolve(path), headers: headers);
+    _updateCookieHeader(response);
     return response;
   }
 
   Future<Response> post(String path, body) async {
-    _headers.forEach((key,value) => log(key +':'+value) );
-    final Response response =
-        await http.post(serverUri.resolve(path), headers: _headers, body: jsonEncode(body));
-    _updateHeaders(response);
+    _headers.forEach((key, value) => log(key + ':' + value));
+    final Response response = await http.post(_serverUri.resolve(path),
+        headers: _headers, body: jsonEncode(body));
+    _updateCookieHeader(response);
     return response;
   }
 
   Future<Response> delete(String path) async {
     final Response response =
-        await http.delete(serverUri.resolve(path), headers: _headers);
-    _updateHeaders(response);
+        await http.delete(_serverUri.resolve(path), headers: _headers);
+    _updateCookieHeader(response);
     return response;
-  }
-
-  void forgetSessionCookie() {
-    _headers.remove('cookie');
   }
 }

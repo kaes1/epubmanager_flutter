@@ -1,10 +1,6 @@
-import 'dart:convert';
 import 'dart:developer';
 
-import 'package:epubmanager_flutter/ApiEndpoints.dart';
-import 'package:epubmanager_flutter/ApiService.dart';
-import 'package:epubmanager_flutter/StateService.dart';
-import 'package:epubmanager_flutter/model/UserInfo.dart';
+import 'package:epubmanager_flutter/AuthenticationService.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
@@ -18,13 +14,13 @@ class LoginScreen extends StatefulWidget {
 }
 
 class LoginScreenState extends State<LoginScreen> {
+  final AuthenticationService _authService =
+      GetIt.instance.get<AuthenticationService>();
+
   //TODO display message when login not successful.
   final formKey = GlobalKey<FormState>();
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
-
-  ApiService _apiService = GetIt.instance.get<ApiService>();
-  final StateService _stateService = GetIt.instance.get<StateService>();
 
   @override
   void dispose() {
@@ -134,28 +130,14 @@ class LoginScreenState extends State<LoginScreen> {
     if (formKey.currentState.validate()) {
       String username = usernameController.text.trim();
       String password = passwordController.text.trim();
-      String basicAuth =
-          'Basic ' + base64Encode(utf8.encode('$username:$password'));
-      log('Trying to login with username: ${username}, password: ${password}, authorization: $basicAuth');
-
-      _apiService
-          .getWithBasicAuth(ApiEndpoints.login, basicAuth)
-          .then((response) {
-        log('StatusCode: ${response.statusCode}');
+      _authService.login(username, password).then((response) {
         if (response.statusCode == 200) {
-          _fetchUserInfo();
-          _stateService.setLoggedIn(true);
-          log('Login success!');
           Navigator.pushReplacementNamed(context, '/book-list');
         } else {
-          _stateService.setLoggedIn(false);
+          //todo display failed login message
         }
       });
     }
-
-
-
-
   }
 
   register() {
@@ -164,17 +146,6 @@ class LoginScreenState extends State<LoginScreen> {
   }
 
   logout() {
-    _apiService.post(ApiEndpoints.logout, null).then((response) {
-      log('StatusCode for logout: ${response.statusCode}');
-      _stateService.setLoggedIn(false);
-    });
-  }
-
-  void _fetchUserInfo() {
-    this._apiService.get(ApiEndpoints.userInfo).then((response) {
-      UserInfo userInfo = UserInfo.fromJson(response);
-      _stateService.setUsername(userInfo.username);
-    });
-
+    _authService.logout();
   }
 }
