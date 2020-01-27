@@ -6,8 +6,8 @@ import 'package:epubmanager_flutter/model/BooksPage.dart';
 import 'package:epubmanager_flutter/model/Tag.dart';
 import 'package:epubmanager_flutter/screens/BookDetailsScreen.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 import 'package:flutter_multiselect/flutter_multiselect.dart';
+import 'package:get_it/get_it.dart';
 
 import '../MenuDrawer.dart';
 
@@ -54,18 +54,19 @@ class BookSearchScreenState extends State<BookSearchScreen> {
       if (_titleSearchController.text.isEmpty) {
         setState(() {
           this.actionIcon = new Icon(Icons.search, color: Colors.white);
-          if(_advancedSearch){
+          if (_advancedSearch) {
             _selectedTags = [];
             _sortDirection = 'ASCENDING';
             _sortType = 'NONE';
-            WidgetsBinding.instance.addPostFrameCallback((_) => _titleAdvancedSearchController.clear());
-            WidgetsBinding.instance.addPostFrameCallback((_) => _authorAdvancedSearchController.clear());
+            WidgetsBinding.instance.addPostFrameCallback(
+                (_) => _titleAdvancedSearchController.clear());
+            WidgetsBinding.instance.addPostFrameCallback(
+                (_) => _authorAdvancedSearchController.clear());
             _advancedSearch = false;
             _resetBooks();
           }
         });
-      }
-      else {
+      } else {
         setState(() {
           this.actionIcon = new Icon(Icons.close, color: Colors.white);
         });
@@ -97,7 +98,8 @@ class BookSearchScreenState extends State<BookSearchScreen> {
                 onPressed: () {
                   setState(() {
                     if (this.actionIcon.icon == Icons.close) {
-                      WidgetsBinding.instance.addPostFrameCallback((_) => _titleSearchController.clear());
+                      WidgetsBinding.instance.addPostFrameCallback(
+                          (_) => _titleSearchController.clear());
                     }
                   });
                 },
@@ -110,7 +112,7 @@ class BookSearchScreenState extends State<BookSearchScreen> {
         actions: <Widget>[
           new IconButton(
             icon: Icon(Icons.filter_list, color: Colors.white),
-            onPressed: (){
+            onPressed: () {
               _advancedSearchDialog(context);
             },
           ),
@@ -121,9 +123,8 @@ class BookSearchScreenState extends State<BookSearchScreen> {
   }
 
   Widget buildBody() {
-    if (_initialLoading){
-      return Center(
-          heightFactor: 10, child: CircularProgressIndicator());
+    if (_initialLoading) {
+      return Center(heightFactor: 10, child: CircularProgressIndicator());
     } else if (_books == null || _books.isEmpty) {
       return Center(
         child: new Text('No results to display!',
@@ -165,15 +166,13 @@ class BookSearchScreenState extends State<BookSearchScreen> {
                     children: <Widget>[
                       Flexible(
                           child: new TextField(
-                            controller: _titleAdvancedSearchController,
-                            decoration: InputDecoration(
-                                labelText: 'Title: '),
-                          )),
+                        controller: _titleAdvancedSearchController,
+                        decoration: InputDecoration(labelText: 'Title: '),
+                      )),
                       Flexible(
                         child: new TextField(
                           controller: _authorAdvancedSearchController,
-                          decoration: InputDecoration(
-                              labelText: 'Author: '),
+                          decoration: InputDecoration(labelText: 'Author: '),
                         ),
                       ),
                       SizedBox(
@@ -182,36 +181,37 @@ class BookSearchScreenState extends State<BookSearchScreen> {
                       Flexible(
                         child: SingleChildScrollView(
                           child: MultiSelect(
-                            autovalidate: false,
-                            titleText: 'Tags: ',
-                            validator: (value) {
-                              if (value == null) {
-                                return 'Please select tag(s)';
-                              } else return null;
-                            },
-                            errorText: 'Please select tag(s)',
-                            dataSource: this._allTags.map((tag) {
-                              return {'name': tag.name, 'id': tag.name};
-                            }).toList(),
-                            textField: 'name',
-                            valueField: 'id',
-                            filterable: false,
-                            required: false,
-                            value: null,
+                              autovalidate: false,
+                              titleText: 'Tags: ',
+                              validator: (value) {
+                                if (value == null) {
+                                  return 'Please select tag(s)';
+                                } else
+                                  return null;
+                              },
+                              errorText: 'Please select tag(s)',
+                              dataSource: this._allTags.map((tag) {
+                                return {'name': tag.name, 'id': tag.name};
+                              }).toList(),
+                              textField: 'name',
+                              valueField: 'id',
+                              filterable: false,
+                              required: false,
+                              value: null,
                               onSaved: (value) {
                                 _selectedTags = value;
-                              }
-                          ),
+                              }),
                         ),
                       ),
                       Flexible(
-                        child:  Row(
+                        child: Row(
                           children: <Widget>[
                             Text('Sort type: '),
                             DropdownButton(
                               value: _sortType,
                               items: _possibleSortTypes.map((status) {
-                                return DropdownMenuItem(child: Text(status), value: status);
+                                return DropdownMenuItem(
+                                    child: Text(status), value: status);
                               }).toList(),
                               onChanged: (value) {
                                 setState(() => _sortType = value);
@@ -221,13 +221,14 @@ class BookSearchScreenState extends State<BookSearchScreen> {
                         ),
                       ),
                       Flexible(
-                        child:  Row(
+                        child: Row(
                           children: <Widget>[
                             Text('Sort direction: '),
                             DropdownButton(
                               value: _sortDirection,
                               items: _possibleSortDirections.map((status) {
-                                return DropdownMenuItem(child: Text(status), value: status);
+                                return DropdownMenuItem(
+                                    child: Text(status), value: status);
                               }).toList(),
                               onChanged: (value) {
                                 setState(() => _sortDirection = value);
@@ -248,10 +249,16 @@ class BookSearchScreenState extends State<BookSearchScreen> {
                                 color: Colors.deepPurple,
                                 textColor: Colors.white,
                                 onPressed: () {
-                                  WidgetsBinding.instance.addPostFrameCallback((_) => _titleSearchController.text='(Advanced search)');
-                                  setState(() { _advancedSearch = true;});
+                                  WidgetsBinding.instance.addPostFrameCallback(
+                                      (_) => _titleSearchController.text =
+                                          '(Advanced search)');
+                                  setState(() {
+                                    _advancedSearch = true;
+                                  });
                                   _resetBooks();
-                                  setState((){ _autofocus = false;});
+                                  setState(() {
+                                    _autofocus = false;
+                                  });
                                   Navigator.of(context).pop();
                                 },
                               ),
@@ -282,27 +289,32 @@ class BookSearchScreenState extends State<BookSearchScreen> {
   }
 
   void _getAllTags() {
-    _bookService.getAllTags().then((allTags){
+    _bookService.getAllTags().then((allTags) {
       setState(() {
         this._allTags = allTags;
       });
     });
   }
 
-
   Future<BooksPage> _getBooksPage(int pageNumber) async {
-    log('Getting book page ${pageNumber}');
-    BooksPage booksPage = await _bookService.findBooks(
-        _advancedSearch ? _titleAdvancedSearchController.text : _titleSearchController.text,
-        _advancedSearch ? _authorAdvancedSearchController.text : '',
-        _selectedTags,
-        pageNumber,
-        15,
-        _sortType,
-        _sortDirection);
-    this._lastPage = booksPage.totalPages - 1;
-    log('Current page: ${pageNumber}, Last Page: ${_lastPage}');
-    return booksPage;
+    log('Getting book page $pageNumber');
+
+    return _bookService
+        .findBooks(
+            _advancedSearch
+                ? _titleAdvancedSearchController.text
+                : _titleSearchController.text,
+            _advancedSearch ? _authorAdvancedSearchController.text : '',
+            _selectedTags,
+            pageNumber,
+            15,
+            _sortType,
+            _sortDirection)
+        .then((booksPage) {
+      this._lastPage = booksPage.totalPages - 1;
+      log('Current page: $pageNumber, Last Page: $_lastPage');
+      return booksPage;
+    });
   }
 
   void _resetBooks() {

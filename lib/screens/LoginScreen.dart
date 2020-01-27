@@ -141,7 +141,6 @@ class LoginScreenState extends State<LoginScreen> {
   }
 
   register() {
-    log('Navigate to /register');
     Navigator.pushReplacementNamed(context, '/register');
   }
 

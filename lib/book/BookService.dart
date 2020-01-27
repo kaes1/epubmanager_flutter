@@ -1,20 +1,19 @@
 import 'dart:convert';
+import 'dart:developer';
 
+import 'package:epubmanager_flutter/ApiEndpoints.dart';
 import 'package:epubmanager_flutter/ApiService.dart';
 import 'package:epubmanager_flutter/model/Book.dart';
 import 'package:epubmanager_flutter/model/BooksPage.dart';
+import 'package:epubmanager_flutter/model/NewBook.dart';
 import 'package:epubmanager_flutter/model/Tag.dart';
 import 'package:get_it/get_it.dart';
-import 'package:epubmanager_flutter/ApiEndpoints.dart';
 
 class BookService {
   final ApiService _apiService = GetIt.instance.get<ApiService>();
 
-
-
-
-  Future<BooksPage> findBooks(String title, String author, List<String> tags, int pageNumber,
-      int pageSize, String sort, String sortDirection) {
+  Future<BooksPage> findBooks(String title, String author, List<String> tags,
+      int pageNumber, int pageSize, String sort, String sortDirection) async {
     Map<String, dynamic> queryParameters = {
       'title': title,
       'author': author,
@@ -28,20 +27,41 @@ class BookService {
     return _apiService
         .get(ApiEndpoints.booksSearch, queryParameters)
         .then((response) {
-          return BooksPage.fromJson(response);
-        });
+      return BooksPage.fromJson(response);
+    });
   }
 
-  Future<Book> getBook(int bookId) {
-    return _apiService.get(ApiEndpoints.books + '/' + bookId.toString()).then((response) {
+  Future<Book> findExactBook(String title, String author) async {
+    Map<String, dynamic> queryParameters = {
+      'title': title,
+      'author': author,
+    };
+
+    return _apiService
+        .get(ApiEndpoints.booksSearch, queryParameters)
+        .then((response) {
       return Book.fromJson(response);
     });
   }
 
-  Future<List<Tag>> getAllTags() {
+  Future<Book> getBook(int bookId) async {
+    return _apiService
+        .get(ApiEndpoints.books + '/' + bookId.toString())
+        .then((response) {
+      return Book.fromJson(response);
+    });
+  }
+
+  Future<Book> addBook(NewBook newBook) async {
+    log(jsonEncode(newBook));
+    return _apiService.post(ApiEndpoints.booksAdd, newBook).then((response) {
+      return Book.fromJson(response);
+    });
+  }
+
+  Future<List<Tag>> getAllTags() async {
     return _apiService.get(ApiEndpoints.tags).then((response) {
       return Tag.listFromJson(response);
     });
   }
-
 }

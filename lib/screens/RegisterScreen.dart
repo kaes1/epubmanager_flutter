@@ -161,7 +161,6 @@ class RegisterScreenState extends State<RegisterScreen> {
   }
 
   login(){
-    log('Navigate to /login');
     Navigator.pushReplacementNamed(context, '/login');
   }
 
@@ -173,7 +172,7 @@ class RegisterScreenState extends State<RegisterScreen> {
       UserRegistrationRequest userRegistrationRequest = new UserRegistrationRequest(username, password);
       apiService.post(ApiEndpoints.register, userRegistrationRequest)
           .then((response) {
-        UserRegistrationResponse userRegistrationResponse = new UserRegistrationResponse.fromJson(json.decode(utf8.decode(response.bodyBytes)));
+        UserRegistrationResponse userRegistrationResponse = new UserRegistrationResponse.fromJson(response);
         if (userRegistrationResponse.success) {
           _showRegistrationDialog('Registration succedded' ,'${userRegistrationResponse.message}', true);
         } else {
