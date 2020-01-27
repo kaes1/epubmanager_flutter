@@ -200,12 +200,14 @@ class BookSearchScreenState extends State<BookSearchScreen> {
                             value: null,
                             change: (value) {
                               setState(() {
+                                this._multiSelectValue = value;
                                 if(value != null) {
-                                  this._multiSelectValue = value;
                                   this._selectedTags = List(value.length);
                                   for (int i = 0; i < value.length; i++) {
                                     this._selectedTags[i] = value[i];
                                   }
+                                } else {
+                                  this._selectedTags = [];
                                 }
                               });
                             },

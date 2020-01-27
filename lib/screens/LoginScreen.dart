@@ -15,7 +15,7 @@ class LoginScreen extends StatefulWidget {
 
 class LoginScreenState extends State<LoginScreen> {
   final AuthenticationService _authService =
-      GetIt.instance.get<AuthenticationService>();
+  GetIt.instance.get<AuthenticationService>();
 
   //TODO display message when login not successful.
   final formKey = GlobalKey<FormState>();
@@ -126,6 +126,51 @@ class LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  _loginFailedDialog(BuildContext context) async {
+
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(
+              'Login failed',
+              textAlign: TextAlign.center,
+            ),
+            content: StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Flexible(
+                      child:  Text("Wrong username or password."),
+                    ),
+                    SizedBox(
+                      height: 10.0,
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: RaisedButton(
+                            child: new Text('OK'),
+                            color: Colors.deepPurple,
+                            textColor: Colors.white,
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                );
+              },
+            ),
+          );
+        });
+  }
+
   login() {
     if (formKey.currentState.validate()) {
       String username = usernameController.text.trim();
@@ -134,7 +179,7 @@ class LoginScreenState extends State<LoginScreen> {
         if (response.statusCode == 200) {
           Navigator.pushReplacementNamed(context, '/book-list');
         } else {
-          //todo display failed login message
+          _loginFailedDialog(context);
         }
       });
     }

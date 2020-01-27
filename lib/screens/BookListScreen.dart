@@ -53,9 +53,9 @@ class BookListScreenState extends State<BookListScreen> with RouteAware {
       appBar: AppBar(
         title: Text('My book list'),
       ),
-      body: ListView(
-        children: generateTiles(),
-      ),
+      body: _bookList.isEmpty ?
+      Center(child: Text('No entries to display!', style: TextStyle(fontSize: 20, color: Colors.red)))
+          : ListView(children: generateTiles()),
     );
   }
 
