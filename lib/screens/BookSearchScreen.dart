@@ -79,6 +79,14 @@ class BookSearchScreenState extends State<BookSearchScreen> {
   }
 
   @override
+  void dispose() {
+    _titleSearchController.dispose();
+    _titleAdvancedSearchController.dispose();
+    _authorAdvancedSearchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: MenuDrawer(),
