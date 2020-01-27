@@ -91,7 +91,7 @@ class BookDetailsScreenState extends State<BookDetailsScreen> {
                 Text('Publisher: ' + (_book.publisher ?? '-'),
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 16)),
-                Text('Rating: ' + _book.rating.toStringAsFixed(2),
+                Text('Rating: ' + (_book.rating?.toStringAsFixed(2) ?? '-'),
                     textAlign: TextAlign.center, style: TextStyle(fontSize: 16))
               ],
             ),
