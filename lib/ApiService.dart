@@ -100,11 +100,11 @@ class ApiService {
     return json.decode(utf8.decode(response.bodyBytes));
   }
 
-  Future<dynamic> delete(String path) async {
+  Future<Response> delete(String path) async {
     final Response response = await http
         .delete(_serverUri.resolve(path), headers: _headers)
         .timeout(Duration(seconds: 3));
     _updateCookieHeader(response);
-    return json.decode(utf8.decode(response.bodyBytes));
+    return response;
   }
 }
