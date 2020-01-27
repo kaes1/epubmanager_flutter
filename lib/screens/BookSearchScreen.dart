@@ -6,8 +6,8 @@ import 'package:epubmanager_flutter/model/BooksPage.dart';
 import 'package:epubmanager_flutter/model/Tag.dart';
 import 'package:epubmanager_flutter/screens/BookDetailsScreen.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 import 'package:flutter_multiselect/flutter_multiselect.dart';
+import 'package:get_it/get_it.dart';
 
 import '../MenuDrawer.dart';
 
@@ -54,7 +54,7 @@ class BookSearchScreenState extends State<BookSearchScreen> {
         setState(() {
           this.actionIcon = new Icon(Icons.search, color: Colors.white);
           if(_advancedSearch){
-            this._selectedTags = [];
+            _selectedTags = [];
             _sortDirection = 'ASCENDING';
             _sortType = 'NONE';
             WidgetsBinding.instance.addPostFrameCallback((_) => _titleAdvancedSearchController.clear());
@@ -96,7 +96,8 @@ class BookSearchScreenState extends State<BookSearchScreen> {
                 onPressed: () {
                   setState(() {
                     if (this.actionIcon.icon == Icons.close) {
-                      WidgetsBinding.instance.addPostFrameCallback((_) => _titleSearchController.clear());
+                      WidgetsBinding.instance.addPostFrameCallback(
+                          (_) => _titleSearchController.clear());
                     }
                   });
                 },
@@ -261,7 +262,6 @@ class BookSearchScreenState extends State<BookSearchScreen> {
                                   WidgetsBinding.instance.addPostFrameCallback((_) => _titleSearchController.text='(Advanced search)');
                                   setState(() {
                                     _advancedSearch = true;
-
                                   });
                                   _resetBooks();
                                   Navigator.of(context).pop();
@@ -304,13 +304,12 @@ class BookSearchScreenState extends State<BookSearchScreen> {
     });
   }
 
-
   Future<BooksPage> _getBooksPage(int pageNumber) async {
     log('Getting book page ${pageNumber}');
     BooksPage booksPage = await _bookService.findBooks(
         _advancedSearch ? _titleAdvancedSearchController.text : _titleSearchController.text,
         _advancedSearch ? _authorAdvancedSearchController.text : '',
-        this._selectedTags,
+        _selectedTags,
         pageNumber,
         15,
         _sortType,
@@ -365,4 +364,9 @@ class ChildItem extends StatelessWidget {
     Navigator.push(context,
         MaterialPageRoute(builder: (context) => BookDetailsScreen(book.id)));
   }
+}
+
+class AlwaysDisabledFocusNode extends FocusNode {
+  @override
+  bool get hasFocus => false;
 }
