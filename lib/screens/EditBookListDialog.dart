@@ -1,4 +1,4 @@
-import 'package:epubmanager_flutter/book/BookListService.dart';
+import 'package:epubmanager_flutter/services/BookListService.dart';
 import 'package:epubmanager_flutter/model/BookListEntry.dart';
 import 'package:epubmanager_flutter/model/Status.dart';
 import 'package:flutter/cupertino.dart';

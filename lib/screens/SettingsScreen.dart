@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:epubmanager_flutter/StateService.dart';
+import 'package:epubmanager_flutter/services/StateService.dart';
 import 'package:get_it/get_it.dart';
 import 'dart:developer';
-import '../MenuDrawer.dart';
+import 'MenuDrawer.dart';
 
 class SettingsScreen extends StatefulWidget {
   @override

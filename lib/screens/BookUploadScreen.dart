@@ -2,7 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:epub/epub.dart';
-import 'package:epubmanager_flutter/book/BookService.dart';
+import 'package:epubmanager_flutter/services/BookService.dart';
 import 'package:epubmanager_flutter/model/Book.dart';
 import 'package:epubmanager_flutter/model/NewBook.dart';
 import 'package:epubmanager_flutter/model/Tag.dart';
@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_multiselect/flutter_multiselect.dart';
 import 'package:get_it/get_it.dart';
 
-import '../MenuDrawer.dart';
+import 'MenuDrawer.dart';
 
 class BookUploadScreen extends StatefulWidget {
   @override

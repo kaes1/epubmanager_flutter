@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:developer';
 
-import 'package:epubmanager_flutter/ApiEndpoints.dart';
-import 'package:epubmanager_flutter/ApiService.dart';
+import 'package:epubmanager_flutter/consts/ApiEndpoints.dart';
+import 'package:epubmanager_flutter/services/ApiService.dart';
 import 'package:epubmanager_flutter/model/Book.dart';
 import 'package:epubmanager_flutter/model/BooksPage.dart';
 import 'package:epubmanager_flutter/model/NewBook.dart';

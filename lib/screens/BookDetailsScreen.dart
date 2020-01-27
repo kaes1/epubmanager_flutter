@@ -1,8 +1,8 @@
-import 'package:epubmanager_flutter/ApiEndpoints.dart';
-import 'package:epubmanager_flutter/ApiService.dart';
-import 'package:epubmanager_flutter/StateService.dart';
-import 'package:epubmanager_flutter/book/BookListService.dart';
-import 'package:epubmanager_flutter/book/BookService.dart';
+import 'package:epubmanager_flutter/consts/ApiEndpoints.dart';
+import 'package:epubmanager_flutter/services/ApiService.dart';
+import 'package:epubmanager_flutter/services/StateService.dart';
+import 'package:epubmanager_flutter/services/BookListService.dart';
+import 'package:epubmanager_flutter/services/BookService.dart';
 import 'package:epubmanager_flutter/model/Book.dart';
 import 'package:epubmanager_flutter/model/BookListEntry.dart';
 import 'package:epubmanager_flutter/model/Comment.dart';

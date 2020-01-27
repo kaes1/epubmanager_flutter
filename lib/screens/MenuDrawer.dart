@@ -1,7 +1,7 @@
 import 'dart:developer';
 
-import 'package:epubmanager_flutter/AuthenticationService.dart';
-import 'package:epubmanager_flutter/StateService.dart';
+import 'package:epubmanager_flutter/services/AuthenticationService.dart';
+import 'package:epubmanager_flutter/services/StateService.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 

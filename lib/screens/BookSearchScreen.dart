@@ -1,6 +1,6 @@
 import 'dart:developer';
 
-import 'package:epubmanager_flutter/book/BookService.dart';
+import 'package:epubmanager_flutter/services/BookService.dart';
 import 'package:epubmanager_flutter/model/Book.dart';
 import 'package:epubmanager_flutter/model/BooksPage.dart';
 import 'package:epubmanager_flutter/model/Tag.dart';
@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_multiselect/flutter_multiselect.dart';
 import 'package:get_it/get_it.dart';
 
-import '../MenuDrawer.dart';
+import 'MenuDrawer.dart';
 
 class BookSearchScreen extends StatefulWidget {
   @override

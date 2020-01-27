@@ -1,5 +1,5 @@
-import 'package:epubmanager_flutter/ApiEndpoints.dart';
-import 'package:epubmanager_flutter/ApiService.dart';
+import 'package:epubmanager_flutter/consts/ApiEndpoints.dart';
+import 'package:epubmanager_flutter/services/ApiService.dart';
 import 'package:epubmanager_flutter/model/BookListEdit.dart';
 import 'package:epubmanager_flutter/model/BookListEntry.dart';
 import 'package:epubmanager_flutter/model/Status.dart';

@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'dart:developer';
 
-import 'package:epubmanager_flutter/ApiEndpoints.dart';
-import 'package:epubmanager_flutter/ApiService.dart';
-import 'package:epubmanager_flutter/StateService.dart';
+import 'package:epubmanager_flutter/consts/ApiEndpoints.dart';
+import 'package:epubmanager_flutter/services/ApiService.dart';
+import 'package:epubmanager_flutter/services/StateService.dart';
 import 'package:epubmanager_flutter/model/UserInfo.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';

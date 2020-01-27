@@ -1,8 +1,8 @@
-import 'package:epubmanager_flutter/ApiService.dart';
-import 'package:epubmanager_flutter/AuthenticationService.dart';
-import 'package:epubmanager_flutter/book/BookListService.dart';
-import 'package:epubmanager_flutter/book/BookService.dart';
-import 'package:epubmanager_flutter/StateService.dart';
+import 'package:epubmanager_flutter/services/ApiService.dart';
+import 'package:epubmanager_flutter/services/AuthenticationService.dart';
+import 'package:epubmanager_flutter/services/BookListService.dart';
+import 'package:epubmanager_flutter/services/BookService.dart';
+import 'package:epubmanager_flutter/services/StateService.dart';
 import 'package:epubmanager_flutter/screens/BookDetailsScreen.dart';
 import 'package:epubmanager_flutter/screens/BookListScreen.dart';
 import 'package:epubmanager_flutter/screens/BookSearchScreen.dart';

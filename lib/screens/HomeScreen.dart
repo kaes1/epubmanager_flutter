@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:epubmanager_flutter/StateService.dart';
+import 'package:epubmanager_flutter/services/StateService.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
-import '../MenuDrawer.dart';
+import 'MenuDrawer.dart';
 
 class HomeScreen extends StatefulWidget {
   @override

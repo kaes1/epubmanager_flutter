@@ -1,4 +1,4 @@
-import 'package:epubmanager_flutter/book/BookListService.dart';
+import 'package:epubmanager_flutter/services/BookListService.dart';
 import 'package:epubmanager_flutter/model/BookListEntry.dart';
 import 'package:epubmanager_flutter/model/Status.dart';
 import 'package:epubmanager_flutter/screens/BookDetailsScreen.dart';
@@ -6,7 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
-import '../MenuDrawer.dart';
+import 'MenuDrawer.dart';
 
 final RouteObserver<PageRoute> routeObserver = new RouteObserver<PageRoute>();
 
