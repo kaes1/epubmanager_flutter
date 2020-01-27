@@ -97,7 +97,7 @@ class HomeScreenState extends State<HomeScreen> {
     return InkWell(
       splashColor: Colors.grey,
       onTap: () {
-        Navigator.pushReplacementNamed(context, route);
+        Navigator.pushNamed(context, route);
       },
       child: GestureDetector(
         child: Card(

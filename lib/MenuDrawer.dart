@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:epubmanager_flutter/AuthenticationService.dart';
 import 'package:epubmanager_flutter/StateService.dart';
 import 'package:flutter/material.dart';
@@ -118,8 +120,17 @@ class MenuDrawer extends StatelessWidget {
   }
 
   void _navigate(String route, BuildContext context) {
-    Navigator.pop(context);
-    Navigator.pushReplacementNamed(context, route);
+    log(ModalRoute.of(context).settings.name);
+    if (ModalRoute.of(context).settings.name == route) {
+      Navigator.pop(context);
+    } else if (route == '/') {
+      log('Pushing replacement');
+      Navigator.pop(context);
+      Navigator.pushReplacementNamed(context, route);
+    } else {
+      Navigator.pop(context);
+      Navigator.pushNamed(context, route);
+    }
   }
 
   void _logout(BuildContext context) {
