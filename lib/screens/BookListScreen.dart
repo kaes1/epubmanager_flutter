@@ -77,7 +77,7 @@ class BookListScreenState extends State<BookListScreen> with RouteAware {
 
                     Icon(Icons.star, color: Colors.amber, size: 45),
                     Text(
-                      entry.rating.toString(),
+                      entry.rating?.toString() ?? '-',
                       style: TextStyle(fontSize: 15),
                     )
                   ],

@@ -47,45 +47,56 @@ class BookUploadScreenState extends State<BookUploadScreen> {
       ),
       body: Center(
         child: Card(
-          child: Column(
-            children: <Widget>[
-              RaisedButton(
-                onPressed: () {
-                  _clearSelection();
-                  _pickEpubFile();
-                },
-                child: Text('CHOOSE'),
-              ),
-              if (_loading) CircularProgressIndicator(),
-              if (_epubMetadata != null)
-                Column(
-                  children: <Widget>[
-                    Divider(),
-                    Text('Title: ' + _epubMetadata.title,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 16)),
-                    Text('Author: ' + _epubMetadata.author,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 16)),
-                    Text('Publisher: ' + (_epubMetadata.publisher ?? '-'),
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 16)),
-                    Text('Language: ' + (_epubMetadata.language ?? '-'),
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 16))
-                  ],
+          child: SizedBox(
+            height: 400,
+            width: 300,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                RaisedButton(
+                  color: Colors.deepPurple,
+                  textColor: Colors.white,
+                  onPressed: () {
+                    _clearSelection();
+                    _pickEpubFile();
+                  },
+                  child: Text('CHOOSE'),
                 ),
-              Divider(),
-              if (_errorMessage != null)
-                Text(_errorMessage, style: TextStyle(color: Colors.red)),
-              if (_errorMessage != null) Divider(),
-              RaisedButton(
-                  child: Text('ADD'),
-                  onPressed:
-                      (_epubMetadata != null && _alreadyExistingBook == null)
-                          ? () => _addBook()
-                          : null)
-            ],
+                if (_loading) CircularProgressIndicator(),
+                if (_epubMetadata != null)
+                  Column(
+                    children: <Widget>[
+                      Divider(),
+                      Text('Title: ' + _epubMetadata.title,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 16)),
+                      Text('Author: ' + _epubMetadata.author,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 16)),
+                      Text('Publisher: ' + (_epubMetadata.publisher ?? '-'),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 16)),
+                      Text('Language: ' + (_epubMetadata.language ?? '-'),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 16))
+                    ],
+                  ),
+                Divider(),
+                if (_errorMessage != null)
+                  Text(_errorMessage, style: TextStyle(color: Colors.red)),
+                if (_errorMessage != null) Divider(),
+                RaisedButton(
+                    child: Text('ADD'),
+                    color: Colors.deepPurple,
+                    textColor: Colors.white,
+                    onPressed:
+                    (_epubMetadata != null && _alreadyExistingBook == null)
+                        ? () => _addBook()
+                        : null)
+              ],
+            ),
           ),
         ),
       ),
@@ -106,29 +117,34 @@ class BookUploadScreenState extends State<BookUploadScreen> {
     _filePath = await FilePicker.getFilePath(
         type: FileType.CUSTOM, fileExtension: 'epub');
     setState(() {
-      _loading = true;
+      if(_filePath == null){
+        _loading = false;
+        _errorMessage = 'EPUB file is not selected';
+      } else
+        _loading = true;
     });
     log('Picked $_filePath');
 
-    List<int> bytes = await new File(_filePath).readAsBytes();
+    if(_filePath != null) {
+      List<int> bytes = await new File(_filePath).readAsBytes();
 
-    try {
-      EpubBook epubBook = await EpubReader.readBook(bytes);
-      EpubMetadata epubMetadata = _retrieveMetadata(epubBook);
-      _fetchBookIfExists(epubMetadata);
-      setState(() {
-        _epubMetadata = epubMetadata;
-      });
-    } on EpubParsingException catch (e) {
-      setState(() {
-        _errorMessage = e.message;
-      });
-    } on Exception {
-      setState(() {
-        _errorMessage = 'EPUB file is invalid.';
-      });
+      try {
+        EpubBook epubBook = await EpubReader.readBook(bytes);
+        EpubMetadata epubMetadata = _retrieveMetadata(epubBook);
+        _fetchBookIfExists(epubMetadata);
+        setState(() {
+          _epubMetadata = epubMetadata;
+        });
+      } on EpubParsingException catch (e) {
+        setState(() {
+          _errorMessage = e.message;
+        });
+      } on Exception {
+        setState(() {
+          _errorMessage = 'EPUB file is invalid.';
+        });
+      }
     }
-
     setState(() {
       _loading = false;
     });
@@ -150,9 +166,9 @@ class BookUploadScreenState extends State<BookUploadScreen> {
       throw new EpubParsingException('E-book contains no author metadata.');
     }
     String language =
-        metadata.Languages.isNotEmpty ? metadata.Languages[0] : null;
+    metadata.Languages.isNotEmpty ? metadata.Languages[0] : null;
     String publisher =
-        metadata.Publishers.isNotEmpty ? metadata.Publishers[0] : null;
+    metadata.Publishers.isNotEmpty ? metadata.Publishers[0] : null;
     return new EpubMetadata(title, author, publisher, language);
   }
 
