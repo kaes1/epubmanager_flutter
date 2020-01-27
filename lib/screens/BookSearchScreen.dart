@@ -29,11 +29,9 @@ class BookSearchScreenState extends State<BookSearchScreen> {
 
   final _titleAdvancedSearchController = new TextEditingController();
   final _authorAdvancedSearchController = new TextEditingController();
-
   final _possibleSortTypes = ['TITLE', 'AUTHOR', 'NONE'];
   final _possibleSortDirections = ['ASCENDING', 'DESCENDING'];
 
-  bool _autofocus = false;
   bool _advancedSearch = false;
 
   Icon actionIcon = new Icon(
@@ -42,6 +40,7 @@ class BookSearchScreenState extends State<BookSearchScreen> {
   );
   List<Tag> _allTags = [];
   List<String> _selectedTags = [];
+  List<dynamic> _multiSelectValue = null;
   String _sortDirection = 'ASCENDING';
   String _sortType = 'NONE';
 
@@ -55,14 +54,14 @@ class BookSearchScreenState extends State<BookSearchScreen> {
         setState(() {
           this.actionIcon = new Icon(Icons.search, color: Colors.white);
           if(_advancedSearch){
-            _selectedTags = [];
+            this._selectedTags = [];
             _sortDirection = 'ASCENDING';
             _sortType = 'NONE';
             WidgetsBinding.instance.addPostFrameCallback((_) => _titleAdvancedSearchController.clear());
             WidgetsBinding.instance.addPostFrameCallback((_) => _authorAdvancedSearchController.clear());
             _advancedSearch = false;
-            _resetBooks();
           }
+          this._resetBooks();
         });
       }
       else {
@@ -85,7 +84,7 @@ class BookSearchScreenState extends State<BookSearchScreen> {
       drawer: MenuDrawer(),
       appBar: AppBar(
         title: new TextField(
-          autofocus: _autofocus,
+          autofocus: false,
           onChanged: (s) => this._resetBooks(),
           controller: _titleSearchController,
           style: new TextStyle(color: Colors.white),
@@ -197,10 +196,19 @@ class BookSearchScreenState extends State<BookSearchScreen> {
                             valueField: 'id',
                             filterable: false,
                             required: false,
+                            initialValue: this._multiSelectValue,
                             value: null,
-                              onSaved: (value) {
-                                _selectedTags = value;
-                              }
+                            change: (value) {
+                              setState(() {
+                                if(value != null) {
+                                  this._multiSelectValue = value;
+                                  this._selectedTags = List(value.length);
+                                  for (int i = 0; i < value.length; i++) {
+                                    this._selectedTags[i] = value[i];
+                                  }
+                                }
+                              });
+                            },
                           ),
                         ),
                       ),
@@ -249,9 +257,11 @@ class BookSearchScreenState extends State<BookSearchScreen> {
                                 textColor: Colors.white,
                                 onPressed: () {
                                   WidgetsBinding.instance.addPostFrameCallback((_) => _titleSearchController.text='(Advanced search)');
-                                  setState(() { _advancedSearch = true;});
+                                  setState(() {
+                                    _advancedSearch = true;
+
+                                  });
                                   _resetBooks();
-                                  setState((){ _autofocus = false;});
                                   Navigator.of(context).pop();
                                 },
                               ),
@@ -284,6 +294,9 @@ class BookSearchScreenState extends State<BookSearchScreen> {
   void _getAllTags() {
     _bookService.getAllTags().then((allTags){
       setState(() {
+        allTags.sort((t1, t2) {
+          return t1.name.compareTo(t2.name);
+        });
         this._allTags = allTags;
       });
     });
@@ -295,7 +308,7 @@ class BookSearchScreenState extends State<BookSearchScreen> {
     BooksPage booksPage = await _bookService.findBooks(
         _advancedSearch ? _titleAdvancedSearchController.text : _titleSearchController.text,
         _advancedSearch ? _authorAdvancedSearchController.text : '',
-        _selectedTags,
+        this._selectedTags,
         pageNumber,
         15,
         _sortType,
@@ -328,6 +341,7 @@ class BookSearchScreenState extends State<BookSearchScreen> {
     }
   }
 }
+
 
 class ChildItem extends StatelessWidget {
   final Book book;
