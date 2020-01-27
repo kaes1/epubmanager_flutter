@@ -39,9 +39,7 @@ class AuthenticationService {
 
   void logout() {
     log('Logging out!');
-    _apiService.post(ApiEndpoints.logout, null).then((response) {
-      log('StatusCode for logout: ${response.statusCode}');
-    });
+    _apiService.post(ApiEndpoints.logout, null).then((response) {});
     _stateService.setLoggedIn(false);
     _stateService.setUsername('');
     _stateService.setCookie('');
@@ -50,7 +48,6 @@ class AuthenticationService {
   void _fetchUserInfo() {
     log('Fetching user info!');
     this._apiService.get(ApiEndpoints.userInfo).then((response) {
-
       UserInfo userInfo = UserInfo.fromJson(response);
       log('Fetched userInfo ${userInfo.username}:${userInfo.loggedIn}');
 
@@ -58,5 +55,4 @@ class AuthenticationService {
       _stateService.setLoggedIn(userInfo.loggedIn);
     });
   }
-
 }

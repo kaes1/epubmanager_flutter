@@ -97,7 +97,6 @@ class HomeScreenState extends State<HomeScreen> {
     return InkWell(
       splashColor: Colors.grey,
       onTap: () {
-        log('Navigate to $route');
         Navigator.pushReplacementNamed(context, route);
       },
       child: GestureDetector(

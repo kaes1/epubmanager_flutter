@@ -79,7 +79,7 @@ class EditBookListDialogState extends State<EditBookListDialog> {
                     child: RaisedButton(
                       child: widget._existingEntry == null
                           ? new Text('ADD')
-                          : new Text('EDIT'),
+                          : new Text('SAVE'),
                       color: Colors.deepPurple,
                       textColor: Colors.white,
                       onPressed:
