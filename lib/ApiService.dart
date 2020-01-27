@@ -97,7 +97,7 @@ class ApiService {
       return Future.error('Error ${response.statusCode}');
     }
 
-    return json.decode(utf8.decode(response.bodyBytes));
+    return response;
   }
 
   Future<Response> delete(String path) async {

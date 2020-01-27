@@ -55,7 +55,7 @@ class BookService {
   Future<Book> addBook(NewBook newBook) async {
     log(jsonEncode(newBook));
     return _apiService.post(ApiEndpoints.booksAdd, newBook).then((response) {
-      return Book.fromJson(response);
+      return Book.fromJson(json.decode(utf8.decode(response.bodyBytes)));
     });
   }
 
