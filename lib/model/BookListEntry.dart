@@ -1,14 +1,15 @@
 import 'dart:developer';
 
 import 'package:epubmanager_flutter/model/Book.dart';
+import 'package:epubmanager_flutter/model/Status.dart';
 
 class BookListEntry {
   final Book book;
   final int rating;
-  final String status; //todo change to enum
+  final Status status;
 
   BookListEntry.fromJson(Map<String, dynamic> json)
-      : status = json['status'],
+      : status = statusFromString(json['status']),
         book = Book.fromJson(json['book']),
         rating = json['rating'];
 

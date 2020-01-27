@@ -26,11 +26,11 @@ class BookDetailsScreenState extends State<BookDetailsScreen> {
   final StateService _stateService = GetIt.instance.get<StateService>();
   final ApiService _apiService = GetIt.instance.get<ApiService>();
   final BookListService _bookListService =
-  GetIt.instance.get<BookListService>();
+      GetIt.instance.get<BookListService>();
   final BookService _bookService = GetIt.instance.get<BookService>();
 
-  BookListEntry _bookListEntry = null;
-  Book _book = null;
+  BookListEntry _bookListEntry;
+  Book _book;
 
   List<Comment> commentList = [];
 
@@ -38,7 +38,7 @@ class BookDetailsScreenState extends State<BookDetailsScreen> {
   void initState() {
     super.initState();
     _fetchBook();
-    if(_stateService.isLoggedIn()) {
+    if (_stateService.isLoggedIn()) {
       _fetchBookListEntry();
     }
     _fetchComments();
@@ -48,14 +48,13 @@ class BookDetailsScreenState extends State<BookDetailsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Book details')),
-      body: new Column(
+      body: ListView(
         children: <Widget>[
-          (_book == null) ? Center(heightFactor: 10, child: CircularProgressIndicator()) : _bookDetailsCard(),
-          new Expanded(
-            child: Container(
-              child: (_book == null) ? Center(heightFactor: 10, child: CircularProgressIndicator()) : _buildCommentsList(),
-            ),
-          )
+          if (_book == null)
+            Center(heightFactor: 10, child: CircularProgressIndicator())
+          else
+            _bookDetailsCard(),
+          if (_book != null) _buildCommentsList()
         ],
       ),
     );
@@ -105,32 +104,36 @@ class BookDetailsScreenState extends State<BookDetailsScreen> {
                     padding: EdgeInsets.symmetric(horizontal: 24.0),
                     child: Row(
                       children: <Widget>[
-                        RaisedButton(
-                          child: _bookListEntry == null
-                              ? new Text('ADD TO MY LIST')
-                              : new Text('EDIT LIST ENTRY'),
-                          onPressed: () => showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return EditBookListDialog(
-                                  _book.id,
-                                  _bookListEntry,
-                                  onClose: () => _actualizeDisplayedInfo(),
-                                );
-                              }),
-                          color: Colors.deepPurple,
-                          textColor: Colors.white,
+                        Expanded(
+                          child: RaisedButton(
+                            child: _bookListEntry == null
+                                ? new Text('ADD TO MY LIST')
+                                : new Text('EDIT LIST ENTRY'),
+                            onPressed: () => showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return EditBookListDialog(
+                                    _book.id,
+                                    _bookListEntry,
+                                    onClose: () => _actualizeDisplayedInfo(),
+                                  );
+                                }),
+                            color: Colors.deepPurple,
+                            textColor: Colors.white,
+                          ),
                         ),
                         SizedBox(
-                          width: 10.0,
+                          width: 10,
                         ),
-                        RaisedButton(
-                          child: new Text('ADD COMMENT'),
-                          onPressed: () {
-                            _addCommentDialog(context);
-                          },
-                          color: Colors.deepPurple,
-                          textColor: Colors.white,
+                        Expanded(
+                          child: RaisedButton(
+                            child: new Text('ADD COMMENT'),
+                            onPressed: () {
+                              _addCommentDialog(context);
+                            },
+                            color: Colors.deepPurple,
+                            textColor: Colors.white,
+                          ),
                         ),
                       ],
                     ),
@@ -146,12 +149,11 @@ class BookDetailsScreenState extends State<BookDetailsScreen> {
   Widget _buildCommentsList() {
     if (commentList == null || commentList.isEmpty) {
       return new Center(
-        child: Text('No comments to display', style: TextStyle(color: Colors.red)),
+        child:
+            Text('No comments to display', style: TextStyle(color: Colors.red)),
       );
     } else {
-      return ListView(
-        scrollDirection: Axis.vertical,
-        shrinkWrap: true,
+      return Column(
         children: commentList
             .map((comment) => new CommentsListItem(comment))
             .toList(),
@@ -181,7 +183,10 @@ class BookDetailsScreenState extends State<BookDetailsScreen> {
                       child: new TextField(
                         controller: commentController,
                         toolbarOptions: const ToolbarOptions(
-                            copy: true, paste: true, cut: true, selectAll: false),
+                            copy: true,
+                            paste: true,
+                            cut: true,
+                            selectAll: false),
                         enableInteractiveSelection: true,
                         autofocus: true,
                         showCursor: true,
@@ -193,7 +198,7 @@ class BookDetailsScreenState extends State<BookDetailsScreen> {
                           filled: true,
                           contentPadding: new EdgeInsets.only(
                               left: 10.0, top: 10.0, bottom: 10.0, right: 10.0),
-                          hintText: ' add review',
+                          hintText: 'Leave a comment...',
                           hintStyle: new TextStyle(
                             color: Colors.grey.shade500,
                             fontSize: 12.0,
@@ -249,12 +254,12 @@ class BookDetailsScreenState extends State<BookDetailsScreen> {
     }
   }
 
-  void _actualizeDisplayedInfo(){
+  void _actualizeDisplayedInfo() {
     _fetchBook();
     _fetchBookListEntry();
   }
 
-  void _fetchBook(){
+  void _fetchBook() {
     _bookService.getBook(widget._bookId).then((book) {
       setState(() {
         _book = book;
@@ -275,8 +280,7 @@ class BookDetailsScreenState extends State<BookDetailsScreen> {
         .get(ApiEndpoints.comments + '/' + widget._bookId.toString())
         .then((response) {
       setState(() {
-        commentList =
-            Comment.listFromJson(response);
+        commentList = Comment.listFromJson(response);
         commentList.sort((c1, c2) {
           return c2.datePosted.compareTo(c1.datePosted);
         });
@@ -299,18 +303,27 @@ class CommentsListItem extends StatelessWidget {
         decoration: BoxDecoration(color: Colors.white),
         child: ListTile(
           contentPadding:
-          EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-          title: Text(
-            this.comment.author +
-                ' commented on ' +
-                this.comment.datePosted.substring(0, 10),
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-          ),
+              EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+          title: RichText(
+              text: TextSpan(children: <TextSpan>[
+            TextSpan(
+                text: this.comment.author,
+                style: TextStyle(
+                    color: Colors.black, fontWeight: FontWeight.bold)),
+            TextSpan(
+                text: ' commented on ', style: TextStyle(color: Colors.black)),
+            TextSpan(
+                text: this.comment.datePosted.substring(0, 10),
+                style:
+                    TextStyle(color: Colors.black, fontWeight: FontWeight.bold))
+          ])),
           subtitle: Row(
             children: <Widget>[
               Icon(Icons.format_quote, color: Colors.deepPurple),
-              Text(this.comment.message.trim(),
-                  style: TextStyle(color: Colors.black))
+              Flexible(
+                child: Text(this.comment.message.trim(),
+                    style: TextStyle(color: Colors.black)),
+              )
             ],
           ),
         ),

@@ -1,5 +1,6 @@
 import 'package:epubmanager_flutter/book/BookListService.dart';
 import 'package:epubmanager_flutter/model/BookListEntry.dart';
+import 'package:epubmanager_flutter/model/Status.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -23,14 +24,12 @@ class EditBookListDialogState extends State<EditBookListDialog> {
       GetIt.instance.get<BookListService>();
 
   final _possibleRatings = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
-  final _possibleStatuses = ['COMPLETED', 'READING', 'PLAN_TO_READ']; //todo status to string method for pretty display
 
   int _selectedRating;
-  String _selectedStatus;
+  Status _selectedStatus;
 
   @override
   Widget build(BuildContext context) {
-
     if (widget._existingEntry != null) {
       this._selectedRating = widget._existingEntry.rating;
       this._selectedStatus = widget._existingEntry.status;
@@ -50,8 +49,9 @@ class EditBookListDialogState extends State<EditBookListDialog> {
               Text('Status: '),
               DropdownButton(
                 value: _selectedStatus,
-                items: _possibleStatuses.map((status) {
-                  return DropdownMenuItem(child: Text(status), value: status);
+                items: Status.values.map((status) {
+                  return DropdownMenuItem(
+                      child: Text(statusToPrettyString(status)), value: status);
                 }).toList(),
                 onChanged: (value) {
                   setState(() => _selectedStatus = value);
@@ -72,8 +72,6 @@ class EditBookListDialogState extends State<EditBookListDialog> {
                 height: 30.0,
               ),
               Row(
-//                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
                   Expanded(
                     child: RaisedButton(
