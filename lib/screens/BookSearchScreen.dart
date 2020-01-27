@@ -33,6 +33,7 @@ class BookSearchScreenState extends State<BookSearchScreen> {
   final _possibleSortDirections = ['ASCENDING', 'DESCENDING'];
 
   bool _advancedSearch = false;
+  final String _advancedSearchText = '(Advanced Search)';
 
   Icon actionIcon = new Icon(
     Icons.search,
@@ -50,25 +51,27 @@ class BookSearchScreenState extends State<BookSearchScreen> {
     this._getAllTags();
 
     _titleSearchController.addListener(() {
+
+      if(_advancedSearch && _titleSearchController.text != _advancedSearchText){
+        _titleSearchController.text = '';
+        _selectedTags = [];
+        _sortDirection = 'ASCENDING';
+        _sortType = 'NONE';
+        WidgetsBinding.instance.addPostFrameCallback((_) => _titleAdvancedSearchController.clear());
+        WidgetsBinding.instance.addPostFrameCallback((_) => _authorAdvancedSearchController.clear());
+        _advancedSearch = false;
+      }
+
       if (_titleSearchController.text.isEmpty) {
         setState(() {
           this.actionIcon = new Icon(Icons.search, color: Colors.white);
-          if(_advancedSearch){
-            _selectedTags = [];
-            _sortDirection = 'ASCENDING';
-            _sortType = 'NONE';
-            WidgetsBinding.instance.addPostFrameCallback((_) => _titleAdvancedSearchController.clear());
-            WidgetsBinding.instance.addPostFrameCallback((_) => _authorAdvancedSearchController.clear());
-            _advancedSearch = false;
-          }
-          this._resetBooks();
         });
-      }
-      else {
+      } else {
         setState(() {
           this.actionIcon = new Icon(Icons.close, color: Colors.white);
         });
       }
+      this._resetBooks();
     });
   }
 
@@ -79,13 +82,21 @@ class BookSearchScreenState extends State<BookSearchScreen> {
   }
 
   @override
+  void dispose() {
+    _titleSearchController.dispose();
+    _titleAdvancedSearchController.dispose();
+    _authorAdvancedSearchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: MenuDrawer(),
       appBar: AppBar(
         title: new TextField(
           autofocus: false,
-          onChanged: (s) => this._resetBooks(),
+//          onChanged: (s) => this._resetBooks(),
           controller: _titleSearchController,
           style: new TextStyle(color: Colors.white),
           decoration: new InputDecoration(
@@ -259,7 +270,9 @@ class BookSearchScreenState extends State<BookSearchScreen> {
                                 color: Colors.deepPurple,
                                 textColor: Colors.white,
                                 onPressed: () {
-                                  WidgetsBinding.instance.addPostFrameCallback((_) => _titleSearchController.text='(Advanced search)');
+//                                  WidgetsBinding.instance.addPostFrameCallback((_) =>
+                                  _titleSearchController.text=_advancedSearchText;
+//                                  );
                                   setState(() {
                                     _advancedSearch = true;
                                   });
@@ -305,33 +318,33 @@ class BookSearchScreenState extends State<BookSearchScreen> {
   }
 
   Future<BooksPage> _getBooksPage(int pageNumber) async {
-    log('Getting book page ${pageNumber}');
     BooksPage booksPage = await _bookService.findBooks(
         _advancedSearch ? _titleAdvancedSearchController.text : _titleSearchController.text,
         _advancedSearch ? _authorAdvancedSearchController.text : '',
-        _selectedTags,
+        _advancedSearch ? _selectedTags : [],
         pageNumber,
-        15,
-        _sortType,
-        _sortDirection);
+        20,
+        _advancedSearch ? _sortType : 'NONE',
+        _advancedSearch ? _sortDirection : 'ASCENDING');
     this._lastPage = booksPage.totalPages - 1;
-    log('Current page: ${pageNumber}, Last Page: ${_lastPage}');
     return booksPage;
   }
 
   void _resetBooks() {
-    this._books = [];
+    log('resetBooks');
+//    this._books = [];
     this._currentPage = 0;
     this._lastPage = 50;
     this._getBooksPage(_currentPage).then((booksPage) {
       this.setState(() {
-        this._books.addAll(booksPage.content);
+        this._books = booksPage.content;
         _initialLoading = false;
       });
     });
   }
 
   void _fetchMoreBooks() {
+    log('fetchMoreBooks');
     if (_currentPage < _lastPage) {
       _currentPage++;
       this._getBooksPage(_currentPage).then((booksPage) {

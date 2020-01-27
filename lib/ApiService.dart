@@ -11,7 +11,6 @@ import 'package:http/http.dart' as http;
 class ApiService {
   final StateService _stateService = GetIt.instance.get<StateService>();
 
-  //KS IP
   Uri _serverUri;
   Map<String, String> _headers = {"content-type": "application/json"};
 
@@ -31,11 +30,9 @@ class ApiService {
     }
   }
 
-  //todo handle bad responses (401, 403 etc)
-
   Future<dynamic> get(String path,
       [Map<String, dynamic> queryParameters]) async {
-    log('ApiService get for $path called!');
+    log('ApiService get for $path called.');
     try {
       final Response response = await http
           .get(
@@ -45,25 +42,19 @@ class ApiService {
           .timeout(Duration(seconds: 3));
       _updateCookieHeader(response);
 
-      log('ApiService get response status code: ${response.statusCode}');
-
       if (response.statusCode == HttpStatus.forbidden ||
           response.statusCode == HttpStatus.unauthorized) {
-        log('Detected ${response.statusCode}!');
         _stateService.setLoggedIn(false);
         return Future.error('Authorization error ${response.statusCode}');
       }
 
       if (response.statusCode > 400) {
-        log('Detected ${response.statusCode}!');
         return Future.error('Error ${response.statusCode}');
       }
       return json.decode(utf8.decode(response.bodyBytes));
-    } on SocketException catch (exception) {
-      log('Detected ${exception.toString()}!');
+    } on SocketException {
       return Future.error('SocketException for $path');
-    } on TimeoutException catch (exception) {
-      log('Detected ${exception.toString()}!');
+    } on TimeoutException {
       return Future.error('TimeoutException for $path');
     }
   }
@@ -79,6 +70,7 @@ class ApiService {
   }
 
   Future<dynamic> post(String path, body) async {
+    log('ApiService post for $path called.');
     final Response response = await http
         .post(_serverUri.resolve(path),
             headers: _headers, body: jsonEncode(body))
@@ -87,13 +79,11 @@ class ApiService {
 
     if (response.statusCode == HttpStatus.forbidden ||
         response.statusCode == HttpStatus.unauthorized) {
-      log('Detected ${response.statusCode}!');
       _stateService.setLoggedIn(false);
       return Future.error('Authorization error ${response.statusCode}');
     }
 
     if (response.statusCode >= 400) {
-      log('Detected ${response.statusCode}!');
       return Future.error('Error ${response.statusCode}');
     }
 
