@@ -20,18 +20,20 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class RegisterScreenState extends State<RegisterScreen> {
-  ApiService apiService = GetIt.instance.get<ApiService>();
+  final ApiService _apiService = GetIt.instance.get<ApiService>();
 
-  final formKey = GlobalKey<FormState>();
-  final usernameController = TextEditingController();
-  final passwordController = TextEditingController();
-  final passwordConfirmController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _passwordConfirmController = TextEditingController();
+
+  final _minPasswordLength = 5;
 
   @override
   void dispose() {
-    usernameController.dispose();
-    passwordController.dispose();
-    passwordConfirmController.dispose();
+    _usernameController.dispose();
+    _passwordController.dispose();
+    _passwordConfirmController.dispose();
     super.dispose();
   }
 
@@ -59,11 +61,11 @@ class RegisterScreenState extends State<RegisterScreen> {
                   child: Padding(
                       padding: EdgeInsets.all(10.0),
                       child: Form(
-                        key: formKey,
+                        key: _formKey,
                         child: Column(
                           children: <Widget>[
                             TextFormField(
-                              controller: usernameController,
+                              controller: _usernameController,
                               decoration: InputDecoration(
                                   prefixIcon: Icon(Icons.person),
                                   labelText: 'Username'),
@@ -78,7 +80,7 @@ class RegisterScreenState extends State<RegisterScreen> {
                               height: 15.0,
                             ),
                             TextFormField(
-                                controller: passwordController,
+                                controller: _passwordController,
                                 decoration: InputDecoration(
                                     prefixIcon: Icon(Icons.lock),
                                     labelText: 'Password'),
@@ -86,8 +88,8 @@ class RegisterScreenState extends State<RegisterScreen> {
                                 validator: (value) {
                                   if (value.isEmpty)
                                     return 'Password cannot be empty';
-                                  else if (value.length < 3)
-                                    return 'Password needs to be at least 3 characters long';
+                                  else if (value.length < _minPasswordLength)
+                                    return 'Password needs to be at least 5 characters long';
                                   else
                                     return null;
                                 }),
@@ -95,13 +97,13 @@ class RegisterScreenState extends State<RegisterScreen> {
                               height: 15.0,
                             ),
                             TextFormField(
-                                controller: passwordConfirmController,
+                                controller: _passwordConfirmController,
                                 decoration: InputDecoration(
                                     prefixIcon: Icon(Icons.lock),
                                     labelText: 'Confirm Password'),
                                 obscureText: true,
                                 validator: (value) {
-                                  if (value != passwordController.text)
+                                  if (value != _passwordController.text)
                                     return 'Passwords do not match';
                                   else
                                     return null;
@@ -169,13 +171,13 @@ class RegisterScreenState extends State<RegisterScreen> {
   }
 
   _register() {
-    if (formKey.currentState.validate()) {
-      String username = usernameController.text.trim();
-      String password = passwordController.text.trim();
+    if (_formKey.currentState.validate()) {
+      String username = _usernameController.text.trim();
+      String password = _passwordController.text.trim();
 
       UserRegistrationRequest userRegistrationRequest =
           new UserRegistrationRequest(username, password);
-      apiService
+      _apiService
           .post(ApiEndpoints.register, userRegistrationRequest)
           .then((response) {
         UserRegistrationResponse userRegistrationResponse =

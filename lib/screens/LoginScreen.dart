@@ -18,14 +18,16 @@ class LoginScreenState extends State<LoginScreen> {
   final AuthenticationService _authService =
       GetIt.instance.get<AuthenticationService>();
 
-  final formKey = GlobalKey<FormState>();
-  final usernameController = TextEditingController();
-  final passwordController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  final _minPasswordLength = 5;
 
   @override
   void dispose() {
-    usernameController.dispose();
-    passwordController.dispose();
+    _usernameController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 
@@ -53,11 +55,11 @@ class LoginScreenState extends State<LoginScreen> {
                   child: Padding(
                       padding: EdgeInsets.all(10.0),
                       child: Form(
-                        key: formKey,
+                        key: _formKey,
                         child: Column(
                           children: <Widget>[
                             TextFormField(
-                              controller: usernameController,
+                              controller: _usernameController,
                               decoration: InputDecoration(
                                   prefixIcon: Icon(Icons.person),
                                   labelText: 'Username'),
@@ -72,7 +74,7 @@ class LoginScreenState extends State<LoginScreen> {
                               height: 15.0,
                             ),
                             TextFormField(
-                                controller: passwordController,
+                                controller: _passwordController,
                                 decoration: InputDecoration(
                                     prefixIcon: Icon(Icons.lock),
                                     labelText: 'Password'),
@@ -80,8 +82,8 @@ class LoginScreenState extends State<LoginScreen> {
                                 validator: (value) {
                                   if (value.isEmpty)
                                     return 'Password cannot be empty';
-                                  else if (value.length < 3)
-                                    return 'Password needs to be at least 3 characters long';
+                                  else if (value.length < _minPasswordLength)
+                                    return 'Password needs to be at least $_minPasswordLength characters long';
                                   else
                                     return null;
                                 }),
@@ -165,9 +167,9 @@ class LoginScreenState extends State<LoginScreen> {
   }
 
   _login() {
-    if (formKey.currentState.validate()) {
-      String username = usernameController.text.trim();
-      String password = passwordController.text.trim();
+    if (_formKey.currentState.validate()) {
+      String username = _usernameController.text.trim();
+      String password = _passwordController.text.trim();
       _authService
           .login(username, password)
           .then((response) {

@@ -32,7 +32,7 @@ class BookDetailsScreenState extends State<BookDetailsScreen> {
   BookListEntry _bookListEntry;
   Book _book;
 
-  List<Comment> commentList = [];
+  List<Comment> _commentList = [];
 
   @override
   void initState() {
@@ -142,14 +142,17 @@ class BookDetailsScreenState extends State<BookDetailsScreen> {
   }
 
   Widget _buildCommentsList() {
-    if (commentList == null || commentList.isEmpty) {
-      return new Center(
-        child:
-            Text('No comments to display', style: TextStyle(color: Colors.red)),
+    if (_commentList == null || _commentList.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 25),
+        child: new Center(
+          child:
+              Text('No comments yet', style: TextStyle(color: Colors.red, fontSize: 18)),
+        ),
       );
     } else {
       return Column(
-        children: commentList
+        children: _commentList
             .map((comment) => new CommentsListItem(comment))
             .toList(),
       );
@@ -269,8 +272,8 @@ class BookDetailsScreenState extends State<BookDetailsScreen> {
         .get(ApiEndpoints.comments + '/' + widget._bookId.toString())
         .then((response) {
       setState(() {
-        commentList = Comment.listFromJson(response);
-        commentList.sort((c1, c2) {
+        _commentList = Comment.listFromJson(response);
+        _commentList.sort((c1, c2) {
           return c2.datePosted.compareTo(c1.datePosted);
         });
       });

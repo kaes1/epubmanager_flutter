@@ -21,15 +21,17 @@ class ApiService {
     _stateService
         .getServerAddress()
         .listen((serverAddress) => _serverUri = Uri.parse(serverAddress));
-    _stateService.getSessionCookie().listen((cookie) => _headers['cookie'] = cookie);
+    _stateService
+        .getSessionCookie()
+        .listen((cookie) => _headers['cookie'] = cookie);
   }
 
   void _updateCookieHeader(Response response) {
     String setCookie = response.headers['set-cookie'];
     if (setCookie != null) {
       int index = setCookie.indexOf(';');
-      _stateService
-          .setSessionCookie((index != -1) ? setCookie.substring(0, index) : setCookie);
+      _stateService.setSessionCookie(
+          (index != -1) ? setCookie.substring(0, index) : setCookie);
     }
   }
 
@@ -49,8 +51,11 @@ class ApiService {
       [Map<String, dynamic> queryParameters]) async {
     log('ApiService get for $path called.');
     try {
-      Response response = await http.get(_serverUri.resolveUri(
-          Uri(path: path, queryParameters: queryParameters)), headers: _headers)
+      Response response = await http
+          .get(
+              _serverUri.resolveUri(
+                  Uri(path: path, queryParameters: queryParameters)),
+              headers: _headers)
           .timeout(Duration(seconds: 3));
       _updateCookieHeader(response);
       _handleHttpErrors(response);
@@ -81,7 +86,7 @@ class ApiService {
     try {
       Response response = await http
           .post(_serverUri.resolve(path),
-          headers: _headers, body: jsonEncode(body))
+              headers: _headers, body: jsonEncode(body))
           .timeout(_timeoutDuration);
       _updateCookieHeader(response);
       _handleHttpErrors(response);
@@ -103,5 +108,4 @@ class ApiService {
       return Future.error(ConnectionException());
     }
   }
-
 }
