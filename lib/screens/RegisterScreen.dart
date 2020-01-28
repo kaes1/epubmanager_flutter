@@ -1,13 +1,16 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
-import 'dart:developer';
-import 'MenuDrawer.dart';
+
 import 'package:epubmanager_flutter/consts/ApiEndpoints.dart';
+import 'package:epubmanager_flutter/consts/AppRoutes.dart';
+import 'package:epubmanager_flutter/exception/ConnectionException.dart';
+import 'package:epubmanager_flutter/screens/NoConnectionDialog.dart';
 import 'package:epubmanager_flutter/services/ApiService.dart';
+import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+
 import '../model/UserRegistrationRequest.dart';
 import '../model/UserRegistrationResponse.dart';
-
+import 'MenuDrawer.dart';
 
 class RegisterScreen extends StatefulWidget {
   @override
@@ -61,7 +64,9 @@ class RegisterScreenState extends State<RegisterScreen> {
                           children: <Widget>[
                             TextFormField(
                               controller: usernameController,
-                              decoration: InputDecoration(prefixIcon: Icon(Icons.person), labelText: 'Username'),
+                              decoration: InputDecoration(
+                                  prefixIcon: Icon(Icons.person),
+                                  labelText: 'Username'),
                               validator: (value) {
                                 if (value.isEmpty)
                                   return 'Username cannot be empty';
@@ -74,7 +79,9 @@ class RegisterScreenState extends State<RegisterScreen> {
                             ),
                             TextFormField(
                                 controller: passwordController,
-                                decoration: InputDecoration(prefixIcon: Icon(Icons.lock), labelText: 'Password'),
+                                decoration: InputDecoration(
+                                    prefixIcon: Icon(Icons.lock),
+                                    labelText: 'Password'),
                                 obscureText: true,
                                 validator: (value) {
                                   if (value.isEmpty)
@@ -89,7 +96,9 @@ class RegisterScreenState extends State<RegisterScreen> {
                             ),
                             TextFormField(
                                 controller: passwordConfirmController,
-                                decoration: InputDecoration(prefixIcon: Icon(Icons.lock), labelText: 'Confirm Password'),
+                                decoration: InputDecoration(
+                                    prefixIcon: Icon(Icons.lock),
+                                    labelText: 'Confirm Password'),
                                 obscureText: true,
                                 validator: (value) {
                                   if (value != passwordController.text)
@@ -100,20 +109,16 @@ class RegisterScreenState extends State<RegisterScreen> {
                             SizedBox(
                               height: 15.0,
                             ),
-                            Material(
-                              borderRadius: BorderRadius.circular(30.0),
-                              child: MaterialButton(
-                                onPressed: register,
-                                color: Colors.deepPurple,
-                                minWidth: 200,
-                                child: Text(
-                                  'REGISTER',
-                                  style: TextStyle(
-                                    fontSize: 16.0,
-                                    color: Colors.white,
+                            Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: RaisedButton(
+                                    onPressed: _register,
+                                    child: Text('REGISTER',
+                                        style: TextStyle(fontSize: 16.0)),
                                   ),
                                 ),
-                              ),
+                              ],
                             )
                           ],
                         ),
@@ -126,9 +131,9 @@ class RegisterScreenState extends State<RegisterScreen> {
               children: <Widget>[
                 Expanded(child: Text("Already have an account?")),
                 GestureDetector(
-                  child: Text( "Login",
-                      style: TextStyle(color: Colors.deepPurple)),
-                  onTap: login,
+                  child: Text("Login",
+                      style: TextStyle(color: Theme.of(context).primaryColor)),
+                  onTap: _navigateToLogin,
                 ),
               ],
             ),
@@ -150,8 +155,7 @@ class RegisterScreenState extends State<RegisterScreen> {
               child: new Text("Close"),
               onPressed: () {
                 Navigator.of(context).pop();
-                if(goToLogin)
-                 login();
+                if (goToLogin) _navigateToLogin();
               },
             ),
           ],
@@ -160,26 +164,32 @@ class RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  login(){
-    Navigator.pushReplacementNamed(context, '/login');
+  _navigateToLogin() {
+    Navigator.pushReplacementNamed(context, AppRoutes.login);
   }
 
-  register(){
+  _register() {
     if (formKey.currentState.validate()) {
       String username = usernameController.text.trim();
       String password = passwordController.text.trim();
 
-      UserRegistrationRequest userRegistrationRequest = new UserRegistrationRequest(username, password);
-      apiService.post(ApiEndpoints.register, userRegistrationRequest)
+      UserRegistrationRequest userRegistrationRequest =
+          new UserRegistrationRequest(username, password);
+      apiService
+          .post(ApiEndpoints.register, userRegistrationRequest)
           .then((response) {
-        UserRegistrationResponse userRegistrationResponse = new UserRegistrationResponse.fromJson(json.decode(utf8.decode(response.bodyBytes)));
+        UserRegistrationResponse userRegistrationResponse =
+            new UserRegistrationResponse.fromJson(
+                json.decode(utf8.decode(response.bodyBytes)));
         if (userRegistrationResponse.success) {
-          _showRegistrationDialog('Registration succedded' ,'${userRegistrationResponse.message}', true);
+          _showRegistrationDialog('Registration succedded',
+              '${userRegistrationResponse.message}', true);
         } else {
-          _showRegistrationDialog('Registration failed' ,'${userRegistrationResponse.message}', false);
+          _showRegistrationDialog('Registration failed',
+              '${userRegistrationResponse.message}', false);
         }
-      });
-
+      }).catchError((error) => NoConnectionDialog.show(context),
+              test: (e) => e is ConnectionException);
     }
   }
 }

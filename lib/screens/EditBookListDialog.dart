@@ -1,6 +1,6 @@
-import 'package:epubmanager_flutter/services/BookListService.dart';
 import 'package:epubmanager_flutter/model/BookListEntry.dart';
 import 'package:epubmanager_flutter/model/Status.dart';
+import 'package:epubmanager_flutter/services/BookListService.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -78,8 +78,6 @@ class EditBookListDialogState extends State<EditBookListDialog> {
                       child: widget._existingEntry == null
                           ? new Text('ADD')
                           : new Text('SAVE'),
-                      color: Colors.deepPurple,
-                      textColor: Colors.white,
                       onPressed:
                           _selectedStatus == null ? null : _editBookListEntry,
                     ),
@@ -88,10 +86,8 @@ class EditBookListDialogState extends State<EditBookListDialog> {
                   if (widget._existingEntry != null)
                     Expanded(
                       child: RaisedButton(
-                        //TODO proper color design
                         child: new Text('DELETE'),
                         color: Colors.redAccent,
-                        textColor: Colors.white,
                         onPressed: _deleteBookListEntry,
                       ),
                     ),
@@ -104,8 +100,6 @@ class EditBookListDialogState extends State<EditBookListDialog> {
                   Expanded(
                     child: RaisedButton(
                       child: new Text('CANCEL'),
-                      color: Colors.deepPurple,
-                      textColor: Colors.white,
                       onPressed: () {
                         Navigator.of(context).pop();
                       },

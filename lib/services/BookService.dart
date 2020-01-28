@@ -1,12 +1,12 @@
+import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:epubmanager_flutter/consts/ApiEndpoints.dart';
-import 'package:epubmanager_flutter/services/ApiService.dart';
 import 'package:epubmanager_flutter/model/Book.dart';
 import 'package:epubmanager_flutter/model/BooksPage.dart';
 import 'package:epubmanager_flutter/model/NewBook.dart';
 import 'package:epubmanager_flutter/model/Tag.dart';
+import 'package:epubmanager_flutter/services/ApiService.dart';
 import 'package:get_it/get_it.dart';
 
 class BookService {
@@ -53,7 +53,6 @@ class BookService {
   }
 
   Future<Book> addBook(NewBook newBook) async {
-    log(jsonEncode(newBook));
     return _apiService.post(ApiEndpoints.booksAdd, newBook).then((response) {
       return Book.fromJson(json.decode(utf8.decode(response.bodyBytes)));
     });

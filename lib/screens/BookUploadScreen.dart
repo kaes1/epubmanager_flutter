@@ -1,12 +1,11 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:epub/epub.dart';
-import 'package:epubmanager_flutter/services/BookService.dart';
 import 'package:epubmanager_flutter/model/Book.dart';
 import 'package:epubmanager_flutter/model/NewBook.dart';
 import 'package:epubmanager_flutter/model/Tag.dart';
 import 'package:epubmanager_flutter/screens/BookDetailsScreen.dart';
+import 'package:epubmanager_flutter/services/BookService.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_multiselect/flutter_multiselect.dart';
@@ -70,12 +69,12 @@ class BookUploadScreenState extends State<BookUploadScreen> {
                       textAlignVertical: TextAlignVertical.center,
                       maxLines: 2,
                       readOnly: true,
-                      onTap: (){
+                      onTap: () {
                         _clearSelection();
                         _pickEpubFile();
                       },
                       decoration: new InputDecoration(
-                        prefixIcon:  Icon(
+                        prefixIcon: Icon(
                           Icons.file_upload,
                           color: Colors.deepPurple,
                         ),
@@ -84,7 +83,6 @@ class BookUploadScreenState extends State<BookUploadScreen> {
                         border: new OutlineInputBorder(
                           borderRadius: new BorderRadius.circular(25.0),
                         ),
-                        //fillColor: Colors.green
                       ),
                     ),
                   ),
@@ -124,7 +122,8 @@ class BookUploadScreenState extends State<BookUploadScreen> {
                           validator: (value) {
                             if (value == null) {
                               return 'Please select tag(s)';
-                            } else return null;
+                            } else
+                              return null;
                           },
                           errorText: 'Please select tag(s)',
                           dataSource: this._allTags.map((tag) {
@@ -139,7 +138,7 @@ class BookUploadScreenState extends State<BookUploadScreen> {
                           change: (value) {
                             setState(() {
                               this._multiSelectValue = value;
-                              if(value != null) {
+                              if (value != null) {
                                 this._selectedTags = List(value.length);
                                 for (int i = 0; i < value.length; i++) {
                                   this._selectedTags[i] = value[i];
@@ -154,11 +153,11 @@ class BookUploadScreenState extends State<BookUploadScreen> {
                     ),
                   if (_errorMessage != null)
                     Text(_errorMessage, style: TextStyle(color: Colors.red)),
-                  if(_alreadyExistingBook != null && _errorMessage != null)
+                  if (_alreadyExistingBook != null && _errorMessage != null)
                     SizedBox(
                       height: 15.0,
                     ),
-                  if(_alreadyExistingBook != null && _errorMessage != null)
+                  if (_alreadyExistingBook != null && _errorMessage != null)
                     InkWell(
                       splashColor: Colors.grey,
                       child: Text(
@@ -166,7 +165,11 @@ class BookUploadScreenState extends State<BookUploadScreen> {
                         style: TextStyle(color: Colors.deepPurple),
                       ),
                       onTap: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => BookDetailsScreen(_alreadyExistingBook.id)));
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => BookDetailsScreen(
+                                    _alreadyExistingBook.id)));
                       },
                     ),
                   SizedBox(
@@ -174,18 +177,15 @@ class BookUploadScreenState extends State<BookUploadScreen> {
                   ),
                   SizedBox(
                     width: 250,
-                    child:Row(
+                    child: Row(
                       children: <Widget>[
                         Expanded(
                             child: RaisedButton(
                                 child: Text('ADD'),
-                                color: Colors.deepPurple,
-                                textColor: Colors.white,
-                                onPressed:
-                                (_epubMetadata != null && _alreadyExistingBook == null)
+                                onPressed: (_epubMetadata != null &&
+                                        _alreadyExistingBook == null)
                                     ? () => _addBook()
-                                    : null)
-                        ),
+                                    : null)),
                       ],
                     ),
                   ),
@@ -214,7 +214,7 @@ class BookUploadScreenState extends State<BookUploadScreen> {
         type: FileType.CUSTOM, fileExtension: 'epub');
 
     setState(() {
-      if(_filePath == null){
+      if (_filePath == null) {
         _loading = false;
         _errorMessage = 'EPUB file is not selected';
         _fileName = '...';
@@ -223,9 +223,8 @@ class BookUploadScreenState extends State<BookUploadScreen> {
         _fileName = _filePath.split('/').last;
       }
     });
-    log('Picked $_filePath');
 
-    if(_filePath != null) {
+    if (_filePath != null) {
       List<int> bytes = await new File(_filePath).readAsBytes();
 
       try {
@@ -266,9 +265,9 @@ class BookUploadScreenState extends State<BookUploadScreen> {
       throw new EpubParsingException('E-book contains no author metadata.');
     }
     String language =
-    metadata.Languages.isNotEmpty ? metadata.Languages[0] : null;
+        metadata.Languages.isNotEmpty ? metadata.Languages[0] : null;
     String publisher =
-    metadata.Publishers.isNotEmpty ? metadata.Publishers[0] : null;
+        metadata.Publishers.isNotEmpty ? metadata.Publishers[0] : null;
     return new EpubMetadata(title, author, publisher, language);
   }
 
@@ -295,7 +294,7 @@ class BookUploadScreenState extends State<BookUploadScreen> {
   }
 
   void _getAllTags() {
-    _bookService.getAllTags().then((allTags){
+    _bookService.getAllTags().then((allTags) {
       setState(() {
         allTags.sort((t1, t2) {
           return t1.name.compareTo(t2.name);

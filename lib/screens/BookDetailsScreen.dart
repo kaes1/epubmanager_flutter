@@ -1,13 +1,13 @@
 import 'package:epubmanager_flutter/consts/ApiEndpoints.dart';
-import 'package:epubmanager_flutter/services/ApiService.dart';
-import 'package:epubmanager_flutter/services/StateService.dart';
-import 'package:epubmanager_flutter/services/BookListService.dart';
-import 'package:epubmanager_flutter/services/BookService.dart';
 import 'package:epubmanager_flutter/model/Book.dart';
 import 'package:epubmanager_flutter/model/BookListEntry.dart';
 import 'package:epubmanager_flutter/model/Comment.dart';
 import 'package:epubmanager_flutter/model/NewComment.dart';
 import 'package:epubmanager_flutter/screens/EditBookListDialog.dart';
+import 'package:epubmanager_flutter/services/ApiService.dart';
+import 'package:epubmanager_flutter/services/BookListService.dart';
+import 'package:epubmanager_flutter/services/BookService.dart';
+import 'package:epubmanager_flutter/services/StateService.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
@@ -106,21 +106,18 @@ class BookDetailsScreenState extends State<BookDetailsScreen> {
                       children: <Widget>[
                         Expanded(
                           child: RaisedButton(
-                            child: _bookListEntry == null
-                                ? new Text('ADD TO MY LIST')
-                                : new Text('EDIT LIST ENTRY'),
-                            onPressed: () => showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return EditBookListDialog(
-                                    _book.id,
-                                    _bookListEntry,
-                                    onClose: () => _actualizeDisplayedInfo(),
-                                  );
-                                }),
-                            color: Colors.deepPurple,
-                            textColor: Colors.white,
-                          ),
+                              child: _bookListEntry == null
+                                  ? new Text('ADD TO MY LIST')
+                                  : new Text('EDIT LIST ENTRY'),
+                              onPressed: () => showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return EditBookListDialog(
+                                      _book.id,
+                                      _bookListEntry,
+                                      onClose: () => _fetchDisplayedInfo(),
+                                    );
+                                  })),
                         ),
                         SizedBox(
                           width: 10,
@@ -131,8 +128,6 @@ class BookDetailsScreenState extends State<BookDetailsScreen> {
                             onPressed: () {
                               _addCommentDialog(context);
                             },
-                            color: Colors.deepPurple,
-                            textColor: Colors.white,
                           ),
                         ),
                       ],
@@ -213,8 +208,6 @@ class BookDetailsScreenState extends State<BookDetailsScreen> {
                           Expanded(
                             child: RaisedButton(
                               child: new Text('ADD'),
-                              color: Colors.deepPurple,
-                              textColor: Colors.white,
                               onPressed: () {
                                 _addComment(commentController.text);
                               },
@@ -226,11 +219,7 @@ class BookDetailsScreenState extends State<BookDetailsScreen> {
                           Expanded(
                             child: RaisedButton(
                               child: new Text('CANCEL'),
-                              color: Colors.deepPurple,
-                              textColor: Colors.white,
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
+                              onPressed: () => Navigator.of(context).pop(),
                             ),
                           ),
                         ],
@@ -254,7 +243,7 @@ class BookDetailsScreenState extends State<BookDetailsScreen> {
     }
   }
 
-  void _actualizeDisplayedInfo() {
+  void _fetchDisplayedInfo() {
     _fetchBook();
     _fetchBookListEntry();
   }

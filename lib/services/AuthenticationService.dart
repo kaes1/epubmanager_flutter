@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:epubmanager_flutter/consts/ApiEndpoints.dart';
+import 'package:epubmanager_flutter/model/UserInfo.dart';
 import 'package:epubmanager_flutter/services/ApiService.dart';
 import 'package:epubmanager_flutter/services/StateService.dart';
-import 'package:epubmanager_flutter/model/UserInfo.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
 
@@ -13,7 +13,7 @@ class AuthenticationService {
   final ApiService _apiService = GetIt.instance.get<ApiService>();
 
   AuthenticationService() {
-    _stateService.getCookie().listen((address) {
+    _stateService.getSessionCookie().listen((address) {
       _fetchUserInfo();
     });
   }
@@ -21,18 +21,14 @@ class AuthenticationService {
   Future<Response> login(String username, String password) {
     String basicAuth =
         'Basic ' + base64Encode(utf8.encode('$username:$password'));
-    log('Trying to login with username: $username, password: $password, authorization: $basicAuth');
+    log('Trying to login with username: $username');
 
     return _apiService
         .getWithBasicAuth(ApiEndpoints.login, basicAuth)
         .then((response) {
-      if (response.statusCode == 200) {
-        log('Login success!');
-        _fetchUserInfo();
-        _stateService.setLoggedIn(true);
-      } else {
-        _stateService.setLoggedIn(false);
-      }
+      log('Login successful!');
+      _fetchUserInfo();
+      _stateService.setLoggedIn(true);
       return response;
     });
   }
@@ -42,7 +38,7 @@ class AuthenticationService {
     _apiService.post(ApiEndpoints.logout, null).then((response) {});
     _stateService.setLoggedIn(false);
     _stateService.setUsername('');
-    _stateService.setCookie('');
+    _stateService.setSessionCookie('');
   }
 
   void _fetchUserInfo() {

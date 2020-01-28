@@ -1,5 +1,4 @@
-import 'dart:developer';
-
+import 'package:epubmanager_flutter/consts/AppRoutes.dart';
 import 'package:epubmanager_flutter/services/AuthenticationService.dart';
 import 'package:epubmanager_flutter/services/StateService.dart';
 import 'package:flutter/material.dart';
@@ -43,32 +42,33 @@ class MenuDrawer extends StatelessWidget {
                 'Logged in as ${_stateService.getUsername()}')
           else
             _createDrawerHeader(Icons.help_outline, 'Not logged in'),
-          _createDrawerItem(Icons.home, 'Home', () => _navigate('/', context)),
+          _createDrawerItem(
+              Icons.home, 'Home', () => _navigate(AppRoutes.home, context)),
           _divider(),
           _createDrawerItem(Icons.search, 'Browse books',
-              () => _navigate('/search', context)),
+              () => _navigate(AppRoutes.search, context)),
           _divider(),
           if (this._stateService.isLoggedIn())
             _createDrawerItem(Icons.note_add, 'Add book',
-                () => _navigate('/book-upload', context)),
+                () => _navigate(AppRoutes.bookUpload, context)),
           if (this._stateService.isLoggedIn()) _divider(),
           if (this._stateService.isLoggedIn())
-            _createDrawerItem(
-                Icons.list, 'My List', () => _navigate('/book-list', context)),
+            _createDrawerItem(Icons.list, 'My List',
+                () => _navigate(AppRoutes.bookList, context)),
           if (this._stateService.isLoggedIn()) _divider(),
           if (!this._stateService.isLoggedIn())
-            _createDrawerItem(
-                Icons.exit_to_app, 'Login', () => _navigate('/login', context))
+            _createDrawerItem(Icons.exit_to_app, 'Login',
+                () => _navigate(AppRoutes.login, context))
           else
             _createDrawerItem(
                 Icons.exit_to_app, 'Logout', () => _logout(context)),
           _divider(),
           if (!this._stateService.isLoggedIn())
             _createDrawerItem(Icons.person_add, 'Register',
-                () => _navigate('/register', context)),
+                () => _navigate(AppRoutes.register, context)),
           if (!this._stateService.isLoggedIn()) _divider(),
           _createDrawerItem(Icons.settings, 'Settings',
-              () => _navigate('/settings', context)),
+              () => _navigate(AppRoutes.settings, context)),
           _divider(),
         ],
       ),
@@ -83,19 +83,14 @@ class MenuDrawer extends StatelessWidget {
     return UserAccountsDrawerHeader(
       currentAccountPicture: new CircleAvatar(
           backgroundColor: Colors.white,
-          //backgroundColor: Colors.deepPurple,
           child: new Icon(
             icon,
-            color: Colors.deepPurple[400],
-            //color:Colors.white,
+            color: Colors.deepPurple,
             size: 70,
           )),
       accountName: Text(
         text,
-        style: TextStyle(
-            color: Colors.white,
-            //color: Colors.black,
-            fontSize: 18),
+        style: TextStyle(color: Colors.white, fontSize: 18),
       ),
       decoration: BoxDecoration(color: Colors.deepPurple[400]),
       accountEmail: null,
@@ -120,11 +115,9 @@ class MenuDrawer extends StatelessWidget {
   }
 
   void _navigate(String route, BuildContext context) {
-    log(ModalRoute.of(context).settings.name);
     if (ModalRoute.of(context).settings.name == route) {
       Navigator.pop(context);
-    } else if (route == '/') {
-      log('Pushing replacement');
+    } else if (route == AppRoutes.home) {
       Navigator.pop(context);
       Navigator.pushReplacementNamed(context, route);
     } else {
@@ -136,6 +129,6 @@ class MenuDrawer extends StatelessWidget {
   void _logout(BuildContext context) {
     _authService.logout();
     Navigator.pop(context);
-    Navigator.pushReplacementNamed(context, '/login');
+    Navigator.pushReplacementNamed(context, AppRoutes.login);
   }
 }

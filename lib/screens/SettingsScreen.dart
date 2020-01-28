@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:epubmanager_flutter/services/StateService.dart';
+import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'dart:developer';
+
 import 'MenuDrawer.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -20,7 +20,6 @@ class SettingsScreenState extends State<SettingsScreen> {
   void initState() {
     super.initState();
     _stateService.getServerAddress().listen((serverAddress) => setState(() {
-          log('In SettingsScreen listen!');
           _serverAddressController.text = serverAddress;
         }));
   }

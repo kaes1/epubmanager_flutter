@@ -1,4 +1,3 @@
-
 abstract class ApiEndpoints {
   static const String register = '/api/register';
   static const String login = '/api/secure/login';

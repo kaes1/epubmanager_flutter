@@ -1,5 +1,6 @@
-import 'dart:developer';
-
+import 'package:epubmanager_flutter/consts/AppRoutes.dart';
+import 'package:epubmanager_flutter/exception/ConnectionException.dart';
+import 'package:epubmanager_flutter/screens/NoConnectionDialog.dart';
 import 'package:epubmanager_flutter/services/AuthenticationService.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -15,9 +16,8 @@ class LoginScreen extends StatefulWidget {
 
 class LoginScreenState extends State<LoginScreen> {
   final AuthenticationService _authService =
-  GetIt.instance.get<AuthenticationService>();
+      GetIt.instance.get<AuthenticationService>();
 
-  //TODO display message when login not successful.
   final formKey = GlobalKey<FormState>();
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
@@ -88,20 +88,16 @@ class LoginScreenState extends State<LoginScreen> {
                             SizedBox(
                               height: 15.0,
                             ),
-                            Material(
-                              borderRadius: BorderRadius.circular(30.0),
-                              child: MaterialButton(
-                                onPressed: login,
-                                color: Colors.deepPurple,
-                                minWidth: 200,
-                                child: Text(
-                                  'LOGIN',
-                                  style: TextStyle(
-                                    fontSize: 16.0,
-                                    color: Colors.white,
+                            Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: RaisedButton(
+                                    onPressed: _login,
+                                    child: Text('LOGIN',
+                                        style: TextStyle(fontSize: 16.0)),
                                   ),
                                 ),
-                              ),
+                              ],
                             )
                           ],
                         ),
@@ -115,8 +111,8 @@ class LoginScreenState extends State<LoginScreen> {
                 Expanded(child: Text("Don't have an account?")),
                 GestureDetector(
                   child: Text("Register",
-                      style: TextStyle(color: Colors.deepPurple)),
-                  onTap: register,
+                      style: TextStyle(color: Theme.of(context).primaryColor)),
+                  onTap: _navigateToRegister,
                 ),
               ],
             ),
@@ -126,9 +122,8 @@ class LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  _loginFailedDialog(BuildContext context) async {
-
-    return showDialog(
+  _showLoginFailedDialog(BuildContext context) {
+    showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
@@ -144,7 +139,7 @@ class LoginScreenState extends State<LoginScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     Flexible(
-                      child:  Text("Wrong username or password."),
+                      child: Text("Wrong username or password."),
                     ),
                     SizedBox(
                       height: 10.0,
@@ -154,8 +149,6 @@ class LoginScreenState extends State<LoginScreen> {
                         Expanded(
                           child: RaisedButton(
                             child: new Text('OK'),
-                            color: Colors.deepPurple,
-                            textColor: Colors.white,
                             onPressed: () {
                               Navigator.of(context).pop();
                             },
@@ -171,25 +164,22 @@ class LoginScreenState extends State<LoginScreen> {
         });
   }
 
-  login() {
+  _login() {
     if (formKey.currentState.validate()) {
       String username = usernameController.text.trim();
       String password = passwordController.text.trim();
-      _authService.login(username, password).then((response) {
-        if (response.statusCode == 200) {
-          Navigator.pushReplacementNamed(context, '/book-list');
-        } else {
-          _loginFailedDialog(context);
-        }
-      });
+      _authService
+          .login(username, password)
+          .then((response) {
+            Navigator.pushReplacementNamed(context, AppRoutes.bookList);
+          })
+          .catchError((error) => NoConnectionDialog.show(context),
+              test: (e) => e is ConnectionException)
+          .catchError((error) => _showLoginFailedDialog(context));
     }
   }
 
-  register() {
-    Navigator.pushReplacementNamed(context, '/register');
-  }
-
-  logout() {
-    _authService.logout();
+  _navigateToRegister() {
+    Navigator.pushReplacementNamed(context, AppRoutes.register);
   }
 }
