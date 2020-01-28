@@ -49,6 +49,6 @@ class AuthenticationService {
 
       _stateService.setUsername(userInfo.username);
       _stateService.setLoggedIn(userInfo.loggedIn);
-    });
+    }).catchError((error){});
   }
 }
